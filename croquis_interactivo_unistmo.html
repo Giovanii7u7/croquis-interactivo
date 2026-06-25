@@ -1,0 +1,690 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { min-height: 100%; }
+body { font-family: var(--font-sans, sans-serif); }
+
+.app {
+  min-height: 100dvh;
+  background: var(--color-background-tertiary);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: #1a3a5c;
+  color: white;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.header h1 { font-size: 16px; font-weight: 500; }
+.header .subtitle { font-size: 12px; opacity: 0.7; }
+
+.map-section {
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.map-hint {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.map-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  border: 0.5px solid var(--color-border-tertiary);
+  background: #fdf8f0;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 260px;
+}
+
+#mapViewport {
+  position: relative;
+  width: 100%;
+  max-width: 1600px;
+  transform-origin: center center;
+  display: inline-block;
+}
+
+#hotspotsContainer {
+  position: absolute;
+  inset: 0;
+}
+
+#mapViewport img {
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .map-section { padding: 12px; }
+  .map-wrapper { min-height: 320px; }
+}
+
+.hotspot {
+  position: absolute;
+  border-radius: 6px;
+  background: rgba(255,255,255,0);
+  border: 2px solid transparent;
+  transition: background 0.15s, border-color 0.15s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hotspot:hover {
+  background: rgba(255,255,255,0.25);
+  border-color: rgba(255,255,255,0.6);
+}
+.hotspot:active {
+  background: rgba(255,255,255,0.4);
+}
+
+.panel-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.panel-overlay.open { display: flex; }
+
+.panel {
+  background: var(--color-background-primary);
+  border-radius: var(--border-radius-lg);
+  padding: 24px;
+  max-width: 420px;
+  width: 100%;
+  border: 0.5px solid var(--color-border-tertiary);
+}
+
+.panel-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.panel-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--border-radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+.panel-title { font-size: 18px; font-weight: 500; color: var(--color-text-primary); margin-left: 12px; flex: 1; }
+.panel-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-size: 20px;
+  padding: 2px 6px;
+  border-radius: var(--border-radius-md);
+  line-height: 1;
+}
+.panel-close:hover { background: var(--color-background-secondary); }
+
+.panel-badge {
+  display: inline-block;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 14px;
+  font-weight: 500;
+}
+
+.info-row {
+  display: flex;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 0.5px solid var(--color-border-tertiary);
+  font-size: 14px;
+  align-items: flex-start;
+}
+.info-row:last-child { border-bottom: none; }
+.info-label { color: var(--color-text-secondary); min-width: 90px; }
+.info-value { color: var(--color-text-primary); }
+
+.desc-text {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+</style>
+
+<div class="app">
+  <div class="header">
+    <i class="ti ti-map-2" style="font-size:20px;" aria-hidden="true"></i>
+    <div>
+      <div class="header h1">Croquis Digital UNISTMO</div>
+      <div class="header subtitle">Campus Ixtepec — Mapa Interactivo</div>
+    </div>
+  </div>
+
+  <div class="map-section">
+    <div class="map-hint">
+      <i class="ti ti-hand-click" aria-hidden="true"></i>
+      Toca cualquier área del mapa para ver su información
+    </div>
+
+    <div class="map-wrapper" id="mapWrapper">
+          <div id="mapViewport" style="touch-action: none;">
+            <img id="mapImg" src="" alt="Croquis del campus universitario UNISTMO" />
+            <div id="hotspotsContainer"></div>
+          </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel-overlay" id="overlay">
+  <div class="panel" id="panel">
+    <div class="panel-header">
+      <div class="panel-icon" id="pIcon"></div>
+      <div class="panel-title" id="pTitle"></div>
+      <button class="panel-close" id="closeBtn" aria-label="Cerrar">×</button>
+    </div>
+    <span class="panel-badge" id="pBadge"></span>
+    <p class="desc-text" id="pDesc"></p>
+    <div id="pRows"></div>
+  </div>
+</div>
+
+<script>
+const areas = [
+  {
+    id: "auditorio",
+    label: "Auditorio",
+    icon: "🎭",
+    category: "Espacios comunes",
+    categoryColor: "#e8f5e9", categoryText: "#2e7d32",
+    desc: "Espacio principal para eventos académicos, conferencias, ceremonias de graduación y actividades culturales de la universidad.",
+    info: { "Capacidad": "~200 personas", "Uso": "Eventos y conferencias", "Horario": "Lun–Vie 8:00–20:00" },
+    x: 4.5, y: 2, w: 18, h: 11
+  },
+  {
+    id: "rectoria",
+    label: "Rectoría",
+    icon: "🏛️",
+    category: "Administración",
+    categoryColor: "#fff8e1", categoryText: "#f57f17",
+    desc: "Oficina central de la máxima autoridad universitaria. Aquí se toman las decisiones académicas y administrativas de mayor relevancia.",
+    info: { "Responsable": "Rector(a) UNISTMO", "Uso": "Administración central", "Atención": "Lun–Vie 9:00–14:00" },
+    x: 22, y: 2, w: 16, h: 11
+  },
+  {
+    id: "servicios",
+    label: "Servicios Escolares",
+    icon: "📋",
+    category: "Servicios",
+    categoryColor: "#fce4ec", categoryText: "#c62828",
+    desc: "Área encargada de trámites escolares: inscripciones, bajas, constancias, kardex, certificados y más servicios administrativos.",
+    info: { "Trámites": "Inscripción, constancias, certificados", "Horario": "Lun–Vie 8:00–15:00", "Contacto": "Módulo presencial" },
+    x: 38.5, y: 2, w: 18, h: 11
+  },
+  {
+    id: "vicerrectoria",
+    label: "Vicerrectoría",
+    icon: "🏢",
+    category: "Administración",
+    categoryColor: "#fff8e1", categoryText: "#f57f17",
+    desc: "Apoyo a la rectoría en funciones académicas y administrativas. Coordina programas académicos y vinculación institucional.",
+    info: { "Dependencia": "Rectoría UNISTMO", "Función": "Coordinación académica", "Atención": "Con cita previa" },
+    x: 17.5, y: 13, w: 28, h: 11
+  },
+  {
+    id: "estacionamiento",
+    label: "Estacionamiento",
+    icon: "🚗",
+    category: "Infraestructura",
+    categoryColor: "#e3f2fd", categoryText: "#1565c0",
+    desc: "Área de estacionamiento vehicular para estudiantes, docentes y personal administrativo de la universidad.",
+    info: { "Capacidad": "Limitada", "Acceso": "Con credencial universitaria", "Horario": "6:00–21:00" },
+    x: 55, y: 2, w: 26, h: 11
+  },
+  {
+    id: "cafeteria",
+    label: "Cafetería",
+    icon: "☕",
+    category: "Servicios",
+    categoryColor: "#fce4ec", categoryText: "#c62828",
+    desc: "Espacio de alimentación para la comunidad universitaria. Ofrece desayunos, comidas y snacks a precios accesibles.",
+    info: { "Servicio": "Desayuno y comida", "Horario": "7:00–18:00", "Acceso": "Toda la comunidad" },
+    x: 83, y: 2, w: 14, h: 16
+  },
+  {
+    id: "bodega",
+    label: "Bodega",
+    icon: "📦",
+    category: "Infraestructura",
+    categoryColor: "#e3f2fd", categoryText: "#1565c0",
+    desc: "Almacén de materiales, equipos y recursos universitarios. Acceso restringido a personal autorizado.",
+    info: { "Acceso": "Personal autorizado", "Uso": "Almacenamiento institucional" },
+    x: 86, y: 22, w: 11, h: 9
+  },
+  {
+    id: "banos_norte",
+    label: "Baños",
+    icon: "🚻",
+    category: "Servicios",
+    categoryColor: "#fce4ec", categoryText: "#c62828",
+    desc: "Sanitarios ubicados en la zona norte del campus, próximos al estacionamiento y edificios administrativos.",
+    info: { "Ubicación": "Zona norte", "Acceso": "Toda la comunidad" },
+    x: 43.5, y: 13, w: 11, h: 7
+  },
+  {
+    id: "cubos",
+    label: "Cubos de Profesores",
+    icon: "👨‍🏫",
+    category: "Docentes",
+    categoryColor: "#e8f5e9", categoryText: "#2e7d32",
+    desc: "Oficinas privadas asignadas a docentes para atención a alumnos, preparación de clases e investigación.",
+    info: { "Acceso": "Estudiantes con cita", "Uso": "Asesorías académicas", "Horario": "Variable por docente" },
+    x: 41, y: 2, w: 13, h: 11
+  },
+  {
+    id: "sala1",
+    label: "Sala 1",
+    icon: "🖥️",
+    category: "Laboratorios",
+    categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
+    desc: "Sala de cómputo para prácticas académicas y uso de software especializado por estudiantes.",
+    info: { "Equipo": "Computadoras de escritorio", "Capacidad": "~20 equipos", "Uso": "Prácticas y tareas" },
+    x: 21, y: 30, w: 10, h: 9
+  },
+  {
+    id: "sala2",
+    label: "Sala 2",
+    icon: "🖥️",
+    category: "Laboratorios",
+    categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
+    desc: "Segunda sala de cómputo para uso académico. Disponible para prácticas de distintas materias.",
+    info: { "Equipo": "Computadoras de escritorio", "Capacidad": "~20 equipos", "Uso": "Prácticas y tareas" },
+    x: 8, y: 30, w: 10, h: 9
+  },
+  {
+    id: "autoacceso",
+    label: "Auto Acceso",
+    icon: "💻",
+    category: "Laboratorios",
+    categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
+    desc: "Sala de autoacceso para práctica de idiomas y aprendizaje autónomo con recursos digitales.",
+    info: { "Uso": "Idiomas y autoaprendizaje", "Acceso": "Alumnos con credencial" },
+    x: 3, y: 42, w: 13, h: 8
+  },
+  {
+    id: "idiomas",
+    label: "Centro de Idiomas / Enfermería",
+    icon: "🌐",
+    category: "Servicios",
+    categoryColor: "#fce4ec", categoryText: "#c62828",
+    desc: "Centro de aprendizaje de lenguas extranjeras y módulo de atención médica básica para la comunidad universitaria.",
+    info: { "Idiomas": "Inglés, francés y otros", "Enfermería": "Atención básica de salud", "Horario": "Lun–Vie 8:00–16:00" },
+    x: 18, y: 42, w: 22, h: 8
+  },
+  {
+    id: "carpinteria",
+    label: "Carpintería",
+    icon: "🔧",
+    category: "Talleres",
+    categoryColor: "#efebe9", categoryText: "#4e342e",
+    desc: "Taller de mantenimiento y construcción de mobiliario universitario. Personal de mantenimiento.",
+    info: { "Acceso": "Personal de mantenimiento", "Función": "Mantenimiento del campus" },
+    x: 3, y: 53, w: 13, h: 8
+  },
+  {
+    id: "sala_redes",
+    label: "Sala de Redes",
+    icon: "🌐",
+    category: "Laboratorios",
+    categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
+    desc: "Laboratorio especializado en redes de computadoras, telecomunicaciones y administración de sistemas.",
+    info: { "Equipamiento": "Switches, routers, servidores", "Uso": "Prácticas de redes" },
+    x: 17, y: 53, w: 10, h: 8
+  },
+  {
+    id: "sala_software",
+    label: "Sala de Software",
+    icon: "💾",
+    category: "Laboratorios",
+    categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
+    desc: "Laboratorio para desarrollo y prueba de software, programación y proyectos de ingeniería informática.",
+    info: { "Software": "IDEs, herramientas de desarrollo", "Uso": "Programación y proyectos" },
+    x: 27, y: 53, w: 10, h: 8
+  },
+  {
+    id: "sala3",
+    label: "Sala 3",
+    icon: "🖥️",
+    category: "Laboratorios",
+    categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
+    desc: "Tercera sala de cómputo general, disponible para uso académico de diversas carreras.",
+    info: { "Capacidad": "~20 equipos", "Uso": "General académico" },
+    x: 17, y: 60, w: 20, h: 9
+  },
+  {
+    id: "electronica",
+    label: "Electrónica",
+    icon: "⚡",
+    category: "Talleres",
+    categoryColor: "#efebe9", categoryText: "#4e342e",
+    desc: "Laboratorio de electrónica para prácticas de circuitos, sistemas embebidos y proyectos de ingeniería.",
+    info: { "Equipamiento": "Osciloscopios, fuentes, componentes", "Uso": "Prácticas de electrónica" },
+    x: 13, y: 71, w: 16, h: 8
+  },
+  {
+    id: "estatua",
+    label: "Estatua",
+    icon: "🗿",
+    category: "Espacios comunes",
+    categoryColor: "#e8f5e9", categoryText: "#2e7d32",
+    desc: "Punto de referencia icónico del campus universitario. Sirve como punto de encuentro entre estudiantes.",
+    info: { "Función": "Punto de referencia del campus", "Ubicación": "Zona central" },
+    x: 37, y: 53, w: 10, h: 8
+  },
+  {
+    id: "biblioteca",
+    label: "Biblioteca",
+    icon: "📚",
+    category: "Servicios",
+    categoryColor: "#fce4ec", categoryText: "#c62828",
+    desc: "Acervo bibliográfico y espacio de estudio. Cuenta con libros, revistas, bases de datos y salas de lectura.",
+    info: { "Acervo": "Libros, revistas y recursos digitales", "Préstamos": "Con credencial vigente", "Horario": "Lun–Vie 8:00–20:00" },
+    x: 39.5, y: 87, w: 16, h: 10
+  },
+  {
+    id: "casa_rector",
+    label: "Casa del Rector",
+    icon: "🏠",
+    category: "Administración",
+    categoryColor: "#fff8e1", categoryText: "#f57f17",
+    desc: "Residencia oficial del rector universitario dentro del campus.",
+    info: { "Acceso": "Restringido", "Uso": "Residencia oficial" },
+    x: 24, y: 87, w: 16, h: 10
+  },
+  {
+    id: "habitaciones",
+    label: "Habitaciones de Profesores",
+    icon: "🛏️",
+    category: "Docentes",
+    categoryColor: "#e8f5e9", categoryText: "#2e7d32",
+    desc: "Alojamiento temporal para docentes visitantes o de otras sedes que requieren hospedaje durante su estancia académica.",
+    info: { "Acceso": "Docentes autorizados", "Uso": "Hospedaje temporal" },
+    x: 56, y: 87, w: 19, h: 10
+  },
+  {
+    id: "sala_tesis",
+    label: "Sala de Tesis",
+    icon: "🎓",
+    category: "Académico",
+    categoryColor: "#e0f7fa", categoryText: "#006064",
+    desc: "Sala especializada para trabajo de titulación, asesorías de tesis y consulta de trabajos de investigación previos.",
+    info: { "Uso": "Trabajo de titulación", "Acceso": "Alumnos en proceso de tesis", "Recursos": "Bibliografía especializada" },
+    x: 83.5, y: 35, w: 13, h: 12
+  },
+  {
+    id: "sala_trabajo1",
+    label: "Sala de Trabajo en Equipo",
+    icon: "👥",
+    category: "Académico",
+    categoryColor: "#e0f7fa", categoryText: "#006064",
+    desc: "Salas colaborativas para reuniones de equipos de trabajo, proyectos académicos y actividades grupales.",
+    info: { "Capacidad": "~8 personas", "Reserva": "Con anticipación", "Uso": "Proyectos colaborativos" },
+    x: 78, y: 34, w: 14, h: 12
+  },
+  {
+    id: "banos_sur",
+    label: "Baños (zona sur)",
+    icon: "🚻",
+    category: "Servicios",
+    categoryColor: "#fce4ec", categoryText: "#c62828",
+    desc: "Sanitarios en la zona sur del campus, próximos a las aulas y salas de trabajo.",
+    info: { "Ubicación": "Zona sur", "Acceso": "Toda la comunidad" },
+    x: 83.5, y: 47, w: 13, h: 9
+  },
+  {
+    id: "instituto",
+    label: "Instituto de Estudios Constitucionales",
+    icon: "⚖️",
+    category: "Académico",
+    categoryColor: "#e0f7fa", categoryText: "#006064",
+    desc: "Instituto especializado en derecho constitucional y administrativo. Realiza investigación jurídica y apoya la formación académica en ciencias jurídicas.",
+    info: { "Área": "Derecho constitucional y administrativo", "Función": "Investigación jurídica", "Acceso": "Comunidad universitaria" },
+    x: 65, y: 72, w: 25, h: 14
+  },
+  {
+    id: "aulas_bloque1",
+    label: "Aulas 1–8",
+    icon: "🎒",
+    category: "Aulas",
+    categoryColor: "#fff3e0", categoryText: "#e65100",
+    desc: "Bloque inferior de aulas para clases presenciales. Equipadas con pizarrón, proyector y butacas.",
+    info: { "Aulas": "1, 2, 3, 4, 5, 6, 7, 8", "Capacidad": "~35 alumnos c/u", "Equipamiento": "Proyector y pizarrón" },
+    x: 41, y: 59, w: 36, h: 15
+  },
+  {
+    id: "aulas_bloque2",
+    label: "Aulas 9–16",
+    icon: "🎒",
+    category: "Aulas",
+    categoryColor: "#fff3e0", categoryText: "#e65100",
+    desc: "Bloque intermedio de aulas. Uso para clases de distintas licenciaturas.",
+    info: { "Aulas": "9, 10, 11, 12, 13, 14, 15, 16", "Capacidad": "~35 alumnos c/u", "Equipamiento": "Proyector y pizarrón" },
+    x: 41, y: 43, w: 36, h: 15
+  },
+  {
+    id: "aulas_bloque3",
+    label: "Aulas 17–24",
+    icon: "🎒",
+    category: "Aulas",
+    categoryColor: "#fff3e0", categoryText: "#e65100",
+    desc: "Bloque superior de aulas, zona norte del edificio principal.",
+    info: { "Aulas": "17, 18, 20, 21, 22, 23, 24", "Capacidad": "~35 alumnos c/u", "Equipamiento": "Proyector y pizarrón" },
+    x: 41, y: 27, w: 36, h: 15
+  }
+];
+
+const mapWrapper = document.getElementById('mapWrapper');
+const mapImg = document.getElementById('mapImg');
+const hotspotsContainer = document.getElementById('hotspotsContainer');
+const overlay = document.getElementById('overlay');
+const closeBtn = document.getElementById('closeBtn');
+
+const imgSrc = 'images/croquis.jpeg';
+mapImg.src = imgSrc;
+mapImg.onerror = () => {
+  mapImg.style.display = 'none';
+  mapWrapper.style.background = '#fdf8f0';
+  mapWrapper.style.minHeight = '400px';
+  const fb = document.createElement('div');
+  fb.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;';
+  fb.innerHTML = '<span style="font-size:14px;color:var(--color-text-secondary)">Vista previa del mapa (la imagen se carga desde tu proyecto)</span><span style="font-size:12px;color:var(--color-text-secondary)">Los hotspots están activos — toca cualquier área</span>';
+  mapWrapper.appendChild(fb);
+  mapWrapper.style.height = '500px';
+  renderHotspots(100, 500);
+};
+
+mapImg.onload = () => {
+  renderHotspots(mapImg.naturalWidth, mapImg.naturalHeight);
+  initPanZoom();
+};
+
+// Simple pan & pinch-to-zoom implementation for web
+function initPanZoom() {
+  const viewport = document.getElementById('mapViewport');
+  const maxScale = 3;
+  let minScale = 1;
+  let scale = 1;
+  let lastScale = 1;
+  let startDist = 0;
+  let translate = { x: 0, y: 0 };
+  let lastTouch = null;
+
+  function getBaseSize() {
+    return {
+      width: viewport.offsetWidth,
+      height: viewport.offsetHeight
+    };
+  }
+
+  function isPortraitViewport() {
+    return window.matchMedia('(orientation: portrait)').matches;
+  }
+
+  function clampScale(nextScale) {
+    return Math.min(maxScale, Math.max(minScale, nextScale));
+  }
+
+  function clampTranslate(nextTranslate) {
+    const { width: baseWidth, height: baseHeight } = getBaseSize();
+    const scaledWidth = baseWidth * scale;
+    const scaledHeight = baseHeight * scale;
+    const maxX = Math.max(0, (scaledWidth - mapWrapper.clientWidth) / 2);
+    const maxY = Math.max(0, (scaledHeight - mapWrapper.clientHeight) / 2);
+
+    return {
+      x: Math.min(maxX, Math.max(-maxX, nextTranslate.x)),
+      y: Math.min(maxY, Math.max(-maxY, nextTranslate.y))
+    };
+  }
+
+  function setTransform() {
+    translate = clampTranslate(translate);
+    viewport.style.transform = `translate(${translate.x}px, ${translate.y}px) scale(${scale})`;
+  }
+
+  function resetView() {
+    viewport.style.transform = 'translate(0px, 0px) scale(1)';
+    const { width: baseWidth, height: baseHeight } = getBaseSize();
+    if (!baseWidth || !baseHeight) return;
+
+    const fitWidthScale = mapWrapper.clientWidth / baseWidth;
+    const fitHeightScale = mapWrapper.clientHeight / baseHeight;
+
+    minScale = isPortraitViewport() ? Math.max(1, fitHeightScale) : Math.max(1, fitWidthScale);
+    scale = minScale;
+    lastScale = scale;
+    translate = { x: 0, y: 0 };
+    setTransform();
+  }
+
+  // Touch handlers
+  viewport.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      startDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      lastScale = scale;
+    } else if (e.touches.length === 1) {
+      lastTouch = { x: e.touches[0].clientX - translate.x, y: e.touches[0].clientY - translate.y };
+    }
+  }, { passive: false });
+
+  viewport.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const curDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      const delta = curDist / startDist;
+      scale = clampScale(lastScale * delta);
+      setTransform();
+    } else if (e.touches.length === 1 && lastTouch) {
+      e.preventDefault();
+      translate = {
+        x: e.touches[0].clientX - lastTouch.x,
+        y: e.touches[0].clientY - lastTouch.y
+      };
+      setTransform();
+    }
+  }, { passive: false });
+
+  viewport.addEventListener('touchend', (e) => {
+    if (e.touches.length === 0) lastTouch = null;
+  });
+
+  // Mouse wheel zoom
+  mapWrapper.addEventListener('wheel', (e) => {
+    if (e.ctrlKey || e.metaKey || e.altKey) return; // avoid interfering with browser zoom
+    e.preventDefault();
+    const delta = -e.deltaY * 0.001;
+    scale = clampScale(scale + delta);
+    setTransform();
+  }, { passive: false });
+
+  window.addEventListener('resize', resetView);
+  resetView();
+}
+
+function renderHotspots(natW, natH) {
+  hotspotsContainer.innerHTML = '';
+  areas.forEach(area => {
+    const div = document.createElement('div');
+    div.className = 'hotspot';
+    div.style.left = area.x + '%';
+    div.style.top = area.y + '%';
+    div.style.width = area.w + '%';
+    div.style.height = area.h + '%';
+    div.setAttribute('title', area.label);
+    div.addEventListener('click', () => openPanel(area));
+    hotspotsContainer.appendChild(div);
+  });
+}
+
+function openPanel(area) {
+  document.getElementById('pIcon').textContent = area.icon;
+  document.getElementById('pIcon').style.background = area.categoryColor;
+  document.getElementById('pTitle').textContent = area.label;
+  const badge = document.getElementById('pBadge');
+  badge.textContent = area.category;
+  badge.style.background = area.categoryColor;
+  badge.style.color = area.categoryText;
+  document.getElementById('pDesc').textContent = area.desc;
+
+  const rows = document.getElementById('pRows');
+  rows.innerHTML = '';
+  if (area.info) {
+    Object.entries(area.info).forEach(([k, v]) => {
+      const row = document.createElement('div');
+      row.className = 'info-row';
+      row.innerHTML = `<span class="info-label">${k}</span><span class="info-value">${v}</span>`;
+      rows.appendChild(row);
+    });
+  }
+  overlay.classList.add('open');
+}
+
+closeBtn.addEventListener('click', () => overlay.classList.remove('open'));
+overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') overlay.classList.remove('open'); });
+</script>
