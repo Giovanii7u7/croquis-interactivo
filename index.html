@@ -241,12 +241,13 @@ button, .panel-close { font-family: inherit; font-weight: 600; }
 @media (min-width: 960px) {
   #panelOverview {
     grid-template-columns: 1.4fr 1fr;
-    align-items: start;
+    align-items: stretch;
     gap: 24px;
   }
 
   .panel-media {
     grid-column: 1 / 2;
+    align-self: start;
   }
 
   .panel-media,
@@ -266,6 +267,8 @@ button, .panel-close { font-family: inherit; font-weight: 600; }
 
   #pRows {
     grid-column: 2 / 3;
+    grid-row: 1 / 3;
+    align-self: start;
     padding-left: 18px;
     border-left: 1px solid rgba(148, 163, 184, 0.18);
   }
@@ -302,10 +305,10 @@ button, .panel-close { font-family: inherit; font-weight: 600; }
   flex-shrink: 0;
 }
 .panel-title {
-  font-size: 20px;
+  font-size: 36px;
   font-weight: 700;
   color: #0f172a;
-  line-height: 1.25;
+  line-height: 1.1;
   flex: 1;
   padding-top: 4px;
 }
@@ -456,8 +459,8 @@ button, .panel-close { font-family: inherit; font-weight: 600; }
 
 .panel-badge {
   display: inline-block;
-  font-size: 12px;
-  padding: 6px 12px;
+  font-size: 13px;
+  padding: 8px 14px;
   border-radius: 20px;
   margin-bottom: 12px;
   font-weight: 700;
@@ -465,20 +468,20 @@ button, .panel-close { font-family: inherit; font-weight: 600; }
 
 .info-row {
   display: flex;
-  gap: 8px;
-  padding: 12px 0;
+  gap: 10px;
+  padding: 16px 0;
   border-bottom: 1px solid rgba(148, 163, 184, 0.24);
-  font-size: 14px;
+  font-size: 18px;
   align-items: flex-start;
 }
 .info-row:last-child { border-bottom: none; }
-.info-label { color: #64748b; min-width: 96px; font-weight: 600; }
-.info-value { color: #0f172a; flex: 1; }
+.info-label { color: #64748b; min-width: 120px; font-weight: 700; font-size: 17px; }
+.info-value { color: #0f172a; flex: 1; font-size: 18px; }
 
 .desc-text {
-  font-size: 15px;
+  font-size: 20px;
   color: #334155;
-  line-height: 1.7;
+  line-height: 1.85;
   margin-bottom: 18px;
 }
 
@@ -774,8 +777,8 @@ const areas = [
     icon: "🎭",
     category: "Espacios comunes",
     categoryColor: "#e8f5e9", categoryText: "#2e7d32",
-    desc: "Espacio principal para eventos académicos, conferencias, ceremonias de graduación y actividades culturales de la universidad.",
-    info: { "Capacidad": "~200 personas", "Uso": "Eventos y conferencias", "Horario": "Lun–Vie 8:00–20:00" },
+    desc: "Espacio principal para eventos académicos, conferencias, ceremonias de graduación y actividades culturales de la universidad. Se cierra a las 19:00.",
+    info: { "Capacidad": "~200 personas", "Uso": "Eventos y conferencias", "Horario": "Lun–Vie 8:00–19:00" },
     x: 3.13, y: 4.59, w: 10.21, h: 10.39
   },
   {
@@ -784,8 +787,8 @@ const areas = [
     icon: "🏛️",
     category: "Administración",
     categoryColor: "#fff8e1", categoryText: "#f57f17",
-    desc: "Oficina central de la máxima autoridad universitaria. Aquí se toman las decisiones académicas y administrativas de mayor relevancia.",
-    info: { "Responsable": "Rector(a) UNISTMO", "Uso": "Administración central", "Atención": "Lun–Vie 9:00–14:00" },
+    desc: "Oficina central de la máxima autoridad universitaria. Aquí se toman decisiones académicas y administrativas. Si no se encuentra el rector, se pueden dejar avisos, documentos o recados con el personal encargado.",
+    info: { "Responsable": "Rector(a) UNISTMO", "Uso": "Administración central", "Horario": "Lun–Vie 8:00–19:00", "Atención": "Si no está el rector, deja avisos o documentos con el personal del área" },
     x: 14.21, y: 4.74, w: 10.01, h: 9.94
   },
   {
@@ -794,8 +797,8 @@ const areas = [
     icon: "📋",
     category: "Servicios",
     categoryColor: "#fce4ec", categoryText: "#c62828",
-    desc: "Área encargada de trámites escolares: inscripciones, bajas, constancias, kardex, certificados y más servicios administrativos.",
-    info: { "Trámites": "Inscripción, constancias, certificados", "Horario": "Lun–Vie 8:00–15:00", "Contacto": "Módulo presencial" },
+    desc: "Área encargada de trámites escolares como inscripciones, bajas, constancias y certificados. También atiende objetos perdidos, solicitudes de material como proyectores y cables, y publica el calendario de exámenes parciales y ordinarios.",
+    info: { "Trámites": "Inscripción, constancias, certificados", "Horario": "Lun–Vie 8:00–19:00", "Servicios": "Objetos perdidos, material audiovisual, calendario de exámenes" },
     x: 25.49, y: 5.65, w: 9.61, h: 8.87
   },
   {
@@ -815,7 +818,7 @@ const areas = [
     category: "Infraestructura",
     categoryColor: "#e3f2fd", categoryText: "#1565c0",
     desc: "Área de estacionamiento vehicular para estudiantes, docentes y personal administrativo de la universidad.",
-    info: { "Capacidad": "Limitada", "Acceso": "Con credencial universitaria", "Horario": "6:00–21:00" },
+    info: { "Capacidad": "Limitada", "Acceso": "Con credencial universitaria", "Horario": "Lun–Vie 8:00–19:00" },
     x: 51.23, y: 4.89, w: 14.1, h: 9.33
   },
   {
@@ -824,8 +827,8 @@ const areas = [
     icon: "☕",
     category: "Servicios",
     categoryColor: "#fce4ec", categoryText: "#c62828",
-    desc: "Espacio de alimentación para la comunidad universitaria. Ofrece desayunos, comidas y snacks a precios accesibles.",
-    info: { "Servicio": "Desayuno y comida", "Horario": "7:00–18:00", "Acceso": "Toda la comunidad" },
+    desc: "Espacio de alimentación para la comunidad universitaria. Ofrece desayunos, comidas y snacks; cuenta con descuentos para estudiantes con beca alimenticia y puede ser para comer en el lugar o para llevar.",
+    info: { "Servicio": "Desayuno, comida y snacks", "Horario": "Lun–Vie 8:00–19:00", "Acceso": "Toda la comunidad" },
     x: 82.4, y: 11.74, w: 8.61, h: 13.57
   },
   {
@@ -854,8 +857,8 @@ const areas = [
     icon: "👨‍🏫",
     category: "Docentes",
     categoryColor: "#e8f5e9", categoryText: "#2e7d32",
-    desc: "Oficinas privadas asignadas a docentes para atención a alumnos, preparación de clases e investigación.",
-    info: { "Acceso": "Estudiantes con cita", "Uso": "Asesorías académicas", "Horario": "Variable por docente" },
+    desc: "Oficinas privadas asignadas a docentes para atención a alumnos, preparación de clases e investigación. No se requiere cita; toca la puerta del profesor y te atenderán si está disponible.",
+    info: { "Acceso": "Estudiantes y docentes", "Uso": "Asesorías académicas", "Horario": "Variable según docente" },
     x: 38.26, y: 4.74, w: 10.17, h: 9.02
   },
   {
@@ -864,8 +867,8 @@ const areas = [
     icon: "🖥️",
     category: "Laboratorios",
     categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
-    desc: "Sala de cómputo para prácticas académicas y uso de software especializado por estudiantes.",
-    info: { "Equipo": "Computadoras de escritorio", "Capacidad": "~20 equipos", "Uso": "Prácticas y tareas" },
+    desc: "Sala de cómputo para prácticas académicas, tareas y clases. Los estudiantes usan equipos para sesiones guiadas y trabajo independiente.",
+    info: { "Equipo": "Computadoras de escritorio", "Capacidad": "~30 equipos", "Uso": "Prácticas, tareas y clases" },
     x: 21.17, y: 34.41, w: 7.26, h: 8.24
   },
   {
@@ -874,8 +877,8 @@ const areas = [
     icon: "🖥️",
     category: "Laboratorios",
     categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
-    desc: "Segunda sala de cómputo para uso académico. Disponible para prácticas de distintas materias.",
-    info: { "Equipo": "Computadoras de escritorio", "Capacidad": "~20 equipos", "Uso": "Prácticas y tareas" },
+    desc: "Segunda sala de cómputo para uso académico. Disponible para prácticas, tareas y clases. Los estudiantes pueden imprimir un número limitado de impresiones por mes si llevan sus propias hojas.",
+    info: { "Equipo": "Computadoras de escritorio", "Capacidad": "~30 equipos", "Uso": "Prácticas, tareas y clases" },
     x: 6.8, y: 34.56, w: 7.09, h: 8.09
   },
   {
@@ -884,8 +887,8 @@ const areas = [
     icon: "💻",
     category: "Laboratorios",
     categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
-    desc: "Sala de autoacceso para práctica de idiomas y aprendizaje autónomo con recursos digitales.",
-    info: { "Uso": "Idiomas y autoaprendizaje", "Acceso": "Alumnos con credencial" },
+    desc: "Anteriormente era una sala para trabajos e impresión; ahora es un salón de clase. Ideal para estudiantes que tengan clase aquí.",
+    info: { "Uso": "Salón de clase", "Acceso": "Estudiantes" },
     x: 2.49, y: 51.13, w: 11.2, h: 8.91
   },
   {
@@ -895,12 +898,11 @@ const areas = [
     category: "Servicios",
     categoryColor: "#fce4ec", categoryText: "#c62828",
     desc: "Centro de aprendizaje de lenguas extranjeras y módulo de atención médica básica para la comunidad universitaria.",
-    info: { "Idiomas": "Inglés, francés y otros", "Enfermería": "Atención básica de salud", "Horario": "Lun–Vie 8:00–16:00" },
+    info: { "Idiomas": "Inglés", "Enfermería": "Atención básica de salud", "Horario": "Lun–Vie 8:00–19:00" },
     x: 18.17, y: 51.28, w: 13.95, h: 8.3
   },
   {
     id: "carpinteria",
-    label: "Carpintería",
     icon: "🔧",
     category: "Talleres",
     categoryColor: "#efebe9", categoryText: "#4e342e",
@@ -914,7 +916,7 @@ const areas = [
     icon: "🌐",
     category: "Laboratorios",
     categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
-    desc: "Laboratorio especializado en redes de computadoras, telecomunicaciones y administración de sistemas.",
+    desc: "Laboratorio especializado en redes de computadoras y administración de sistemas.",
     info: { "Equipamiento": "Switches, routers, servidores", "Uso": "Prácticas de redes" },
     x: 13.32, y: 62.89, w: 7.52, h: 7.39
   },
@@ -934,8 +936,8 @@ const areas = [
     icon: "🖥️",
     category: "Laboratorios",
     categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
-    desc: "Tercera sala de cómputo general, disponible para uso académico de diversas carreras.",
-    info: { "Capacidad": "~20 equipos", "Uso": "General académico" },
+    desc: "Salón de clases para alumnos de Licenciatura en Informática e Ingeniería en Desarrollo de Software y Sistemas Inteligentes (DSySI).",
+    info: { "Capacidad": "~20 personas", "Uso": "Estudiantes y profesores de Informática y DSySI" },
     x: 13.66, y: 69.89, w: 14.18, h: 7.33
   },
   {
@@ -954,7 +956,7 @@ const areas = [
     icon: "🗿",
     category: "Espacios comunes",
     categoryColor: "#e8f5e9", categoryText: "#2e7d32",
-    desc: "Punto de referencia icónico del campus universitario. Sirve como punto de encuentro entre estudiantes.",
+    desc: "Punto de referencia icónico del campus universitario. Sirve como punto de encuentro entre estudiantes y como lugar de reunión en simulacros o emergencias.",
     info: { "Función": "Punto de referencia del campus", "Ubicación": "Zona central" },
     x: 33.06, y: 62.43, w: 7.95, h: 9.06
   },
@@ -964,8 +966,8 @@ const areas = [
     icon: "📚",
     category: "Servicios",
     categoryColor: "#fce4ec", categoryText: "#c62828",
-    desc: "Acervo bibliográfico y espacio de estudio. Cuenta con libros, revistas, bases de datos y salas de lectura.",
-    info: { "Acervo": "Libros, revistas y recursos digitales", "Préstamos": "Con credencial vigente", "Horario": "Lun–Vie 8:00–20:00" },
+    desc: "Acervo bibliográfico y espacio de estudio. Cuenta con libros, revistas, bases de datos y tesis de estudiantes. A veces también funciona como un salón de clases.",
+    info: { "Acervo": "Libros, revistas, recursos digitales y tesis estudiantiles", "Préstamos": "A través del sistema SIREB", "Horario": "Lun–Vie 8:00–19:00" },
     x: 39.24, y: 87.15, w: 11.21, h: 9.24
   },
   {
@@ -974,8 +976,8 @@ const areas = [
     icon: "🏠",
     category: "Administración",
     categoryColor: "#fff8e1", categoryText: "#f57f17",
-    desc: "Residencia oficial del rector universitario dentro del campus.",
-    info: { "Acceso": "Restringido", "Uso": "Residencia oficial" },
+    desc: "Antiguamente era la casa del rector, hoy es la instancia de igualdad de género. Mantiene el nombre histórico, pero funciona como centro de atención para temas de igualdad.",
+    info: { "Acceso": "Personas con temas de igualdad de género", "Uso": "Atención y asesoría en igualdad de género" },
     x: 26.48, y: 87.15, w: 11.12, h: 9.09
   },
   {
@@ -994,8 +996,8 @@ const areas = [
     icon: "🎓",
     category: "Académico",
     categoryColor: "#e0f7fa", categoryText: "#006064",
-    desc: "Sala especializada para trabajo de titulación, asesorías de tesis y consulta de trabajos de investigación previos.",
-    info: { "Uso": "Trabajo de titulación", "Acceso": "Alumnos en proceso de tesis", "Recursos": "Bibliografía especializada" },
+    desc: "Sala para que los alumnos presenten su tesis de titulación. También se usan para consultas y asesorías de tesis, pero su función principal es la defensa de trabajos de titulación.",
+    info: { "Uso": "Presentaciones de tesis y asesorías", "Acceso": "Alumnos de titulación y asesores" },
     x: 90.43, y: 38.00, w: 5.98, h: 12.17
   },
   {
@@ -1004,8 +1006,8 @@ const areas = [
     icon: "👥",
     category: "Académico",
     categoryColor: "#e0f7fa", categoryText: "#006064",
-    desc: "Salas colaborativas para reuniones de equipos de trabajo, proyectos académicos y actividades grupales.",
-    info: { "Capacidad": "~8 personas", "Reserva": "Con anticipación", "Uso": "Proyectos colaborativos" },
+    desc: "Sala colaborativa para reuniones de equipo, proyectos académicos y actividades grupales.",
+    info: { "Capacidad": "~40 personas", "Reserva": "Con anticipación", "Uso": "Proyectos colaborativos" },
     x: 83.31, y: 38.11, w: 5.95, h: 25.24
   },
   {
@@ -1035,7 +1037,7 @@ const areas = [
     category: "Aulas",
     categoryColor: "#fff3e0", categoryText: "#e65100",
     desc: "Bloque inferior de aulas para clases presenciales. Equipadas con pizarrón, proyector y butacas.",
-    info: { "Aulas": "1, 2, 3, 4, 5, 6, 7, 8", "Capacidad": "~35 alumnos c/u", "Equipamiento": "Proyector y pizarrón" },
+    info: { "Aulas": "1, 2, 3, 4, 5, 6, 7, 8", "Capacidad": "~30 alumnos c/u", "Equipamiento": "Proyector y pizarrón" },
     x: 44.68, y: 49.87, w: 35.66, h: 13.78
   },
   {
@@ -1045,7 +1047,7 @@ const areas = [
     category: "Aulas",
     categoryColor: "#fff3e0", categoryText: "#e65100",
     desc: "Bloque intermedio de aulas. Uso para clases de distintas licenciaturas.",
-    info: { "Aulas": "9, 10, 11, 12, 13, 14, 15, 16", "Capacidad": "~35 alumnos c/u", "Equipamiento": "Proyector y pizarrón" },
+    info: { "Aulas": "9, 10, 11, 12, 13, 14, 15, 16", "Capacidad": "~30 alumnos c/u", "Equipamiento": "Proyector y pizarrón" },
     x: 44.68, y: 37.37, w: 35.74, h: 12.57
   },
   {
@@ -1055,7 +1057,7 @@ const areas = [
     category: "Aulas",
     categoryColor: "#fff3e0", categoryText: "#e65100",
     desc: "Bloque superior de aulas, zona norte del edificio principal.",
-    info: { "Aulas": "17, 18, 20, 21, 22, 23, 24", "Capacidad": "~35 alumnos c/u", "Equipamiento": "Proyector y pizarrón" },
+    info: { "Aulas": "17, 18, 20, 21, 22, 23, 24", "Capacidad": "~30 alumnos c/u", "Equipamiento": "Proyector y pizarrón" },
     x: 45.02, y: 24.11, w: 35.32, h: 13.33
   }
 ];
