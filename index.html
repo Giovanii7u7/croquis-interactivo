@@ -42,50 +42,6 @@ body { font-family: var(--font-sans, sans-serif); }
   gap: 6px;
 }
 
-.editor-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 12px;
-}
-
-.editor-btn {
-  appearance: none;
-  border: 1px solid #cbd5e1;
-  background: #ffffff;
-  color: #0f172a;
-  border-radius: 999px;
-  padding: 10px 14px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
-}
-
-.editor-btn:hover,
-.editor-btn:active {
-  background: #eff6ff;
-  border-color: #93c5fd;
-}
-
-.editor-btn.is-active {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
-  color: #ffffff;
-}
-
-.editor-btn[disabled] {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.editor-status {
-  font-size: 12px;
-  color: #475569;
-  margin-bottom: 10px;
-  min-height: 18px;
-}
-
 .map-wrapper {
   position: relative;
   width: 100%;
@@ -144,61 +100,6 @@ body { font-family: var(--font-sans, sans-serif); }
 }
 .hotspot:active {
   background: rgba(255,255,255,0.4);
-}
-
-.map-wrapper.is-editing {
-  cursor: default;
-}
-
-.map-wrapper.is-editing .hotspot {
-  background: rgba(59, 130, 246, 0.14);
-  border: 2px solid rgba(37, 99, 235, 0.95);
-  border-radius: 8px;
-  overflow: visible;
-}
-
-.map-wrapper.is-editing .hotspot.is-selected {
-  border-color: #f97316;
-  background: rgba(249, 115, 22, 0.16);
-  box-shadow: 0 0 0 2px rgba(255,255,255,0.9);
-}
-
-.hotspot-label,
-.hotspot-handle {
-  display: none;
-}
-
-.map-wrapper.is-editing .hotspot-label,
-.map-wrapper.is-editing .hotspot-handle {
-  display: block;
-}
-
-.hotspot-label {
-  position: absolute;
-  top: -30px;
-  left: 0;
-  background: rgba(15, 23, 42, 0.92);
-  color: #ffffff;
-  padding: 5px 8px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.hotspot-handle {
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  right: -9px;
-  bottom: -9px;
-  background: #f97316;
-  border: 2px solid #ffffff;
-  border-radius: 50%;
-  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.3);
-  cursor: nwse-resize;
 }
 
 .panel-overlay {
@@ -301,15 +202,6 @@ body { font-family: var(--font-sans, sans-serif); }
 }
 
 @media (max-width: 640px) {
-  .editor-toolbar {
-    gap: 8px;
-  }
-
-  .editor-btn {
-    flex: 1 1 150px;
-    justify-content: center;
-  }
-
   .panel-overlay {
     align-items: flex-end;
     padding: 12px;
@@ -342,12 +234,6 @@ body { font-family: var(--font-sans, sans-serif); }
       Toca cualquier área del mapa para ver su información
     </div>
 
-    <div class="editor-toolbar">
-      <button class="editor-btn" id="toggleEditorBtn" type="button">Editar recuadros</button>
-      <button class="editor-btn" id="saveLayoutBtn" type="button" disabled>Guardar JSON</button>
-      <button class="editor-btn" id="resetLayoutBtn" type="button" disabled>Restaurar</button>
-    </div>
-    <div class="editor-status" id="editorStatus">Modo normal: toca cualquier Ã¡rea para ver su informaciÃ³n.</div>
 
     <div class="map-wrapper" id="mapWrapper">
           <div id="mapViewport" style="touch-action: none;">
@@ -381,7 +267,7 @@ const areas = [
     categoryColor: "#e8f5e9", categoryText: "#2e7d32",
     desc: "Espacio principal para eventos académicos, conferencias, ceremonias de graduación y actividades culturales de la universidad.",
     info: { "Capacidad": "~200 personas", "Uso": "Eventos y conferencias", "Horario": "Lun–Vie 8:00–20:00" },
-    x: 4.5, y: 2, w: 18, h: 11
+    x: 3.13, y: 4.59, w: 10.21, h: 10.39
   },
   {
     id: "rectoria",
@@ -391,7 +277,7 @@ const areas = [
     categoryColor: "#fff8e1", categoryText: "#f57f17",
     desc: "Oficina central de la máxima autoridad universitaria. Aquí se toman las decisiones académicas y administrativas de mayor relevancia.",
     info: { "Responsable": "Rector(a) UNISTMO", "Uso": "Administración central", "Atención": "Lun–Vie 9:00–14:00" },
-    x: 22, y: 2, w: 16, h: 11
+    x: 14.21, y: 4.74, w: 10.01, h: 9.94
   },
   {
     id: "servicios",
@@ -401,7 +287,7 @@ const areas = [
     categoryColor: "#fce4ec", categoryText: "#c62828",
     desc: "Área encargada de trámites escolares: inscripciones, bajas, constancias, kardex, certificados y más servicios administrativos.",
     info: { "Trámites": "Inscripción, constancias, certificados", "Horario": "Lun–Vie 8:00–15:00", "Contacto": "Módulo presencial" },
-    x: 38.5, y: 2, w: 18, h: 11
+    x: 25.49, y: 5.65, w: 9.61, h: 8.87
   },
   {
     id: "vicerrectoria",
@@ -411,7 +297,7 @@ const areas = [
     categoryColor: "#fff8e1", categoryText: "#f57f17",
     desc: "Apoyo a la rectoría en funciones académicas y administrativas. Coordina programas académicos y vinculación institucional.",
     info: { "Dependencia": "Rectoría UNISTMO", "Función": "Coordinación académica", "Atención": "Con cita previa" },
-    x: 17.5, y: 13, w: 28, h: 11
+    x: 13.22, y: 17.87, w: 22.01, h: 10.85
   },
   {
     id: "estacionamiento",
@@ -421,7 +307,7 @@ const areas = [
     categoryColor: "#e3f2fd", categoryText: "#1565c0",
     desc: "Área de estacionamiento vehicular para estudiantes, docentes y personal administrativo de la universidad.",
     info: { "Capacidad": "Limitada", "Acceso": "Con credencial universitaria", "Horario": "6:00–21:00" },
-    x: 55, y: 2, w: 26, h: 11
+    x: 51.23, y: 4.89, w: 14.1, h: 9.33
   },
   {
     id: "cafeteria",
@@ -431,7 +317,7 @@ const areas = [
     categoryColor: "#fce4ec", categoryText: "#c62828",
     desc: "Espacio de alimentación para la comunidad universitaria. Ofrece desayunos, comidas y snacks a precios accesibles.",
     info: { "Servicio": "Desayuno y comida", "Horario": "7:00–18:00", "Acceso": "Toda la comunidad" },
-    x: 83, y: 2, w: 14, h: 16
+    x: 82.4, y: 11.74, w: 8.61, h: 13.57
   },
   {
     id: "bodega",
@@ -441,7 +327,7 @@ const areas = [
     categoryColor: "#e3f2fd", categoryText: "#1565c0",
     desc: "Almacén de materiales, equipos y recursos universitarios. Acceso restringido a personal autorizado.",
     info: { "Acceso": "Personal autorizado", "Uso": "Almacenamiento institucional" },
-    x: 86, y: 22, w: 11, h: 9
+    x: 90.54, y: 26.56, w: 6.03, h: 9.76
   },
   {
     id: "banos_norte",
@@ -451,7 +337,7 @@ const areas = [
     categoryColor: "#fce4ec", categoryText: "#c62828",
     desc: "Sanitarios ubicados en la zona norte del campus, próximos al estacionamiento y edificios administrativos.",
     info: { "Ubicación": "Zona norte", "Acceso": "Toda la comunidad" },
-    x: 43.5, y: 13, w: 11, h: 7
+    x: 46.5, y: 15.74, w: 7.83, h: 5.33
   },
   {
     id: "cubos",
@@ -461,7 +347,7 @@ const areas = [
     categoryColor: "#e8f5e9", categoryText: "#2e7d32",
     desc: "Oficinas privadas asignadas a docentes para atención a alumnos, preparación de clases e investigación.",
     info: { "Acceso": "Estudiantes con cita", "Uso": "Asesorías académicas", "Horario": "Variable por docente" },
-    x: 41, y: 2, w: 13, h: 11
+    x: 38.26, y: 4.74, w: 10.17, h: 9.02
   },
   {
     id: "sala1",
@@ -471,7 +357,7 @@ const areas = [
     categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
     desc: "Sala de cómputo para prácticas académicas y uso de software especializado por estudiantes.",
     info: { "Equipo": "Computadoras de escritorio", "Capacidad": "~20 equipos", "Uso": "Prácticas y tareas" },
-    x: 21, y: 30, w: 10, h: 9
+    x: 21.17, y: 34.41, w: 7.26, h: 8.24
   },
   {
     id: "sala2",
@@ -481,7 +367,7 @@ const areas = [
     categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
     desc: "Segunda sala de cómputo para uso académico. Disponible para prácticas de distintas materias.",
     info: { "Equipo": "Computadoras de escritorio", "Capacidad": "~20 equipos", "Uso": "Prácticas y tareas" },
-    x: 8, y: 30, w: 10, h: 9
+    x: 6.8, y: 34.56, w: 7.09, h: 8.09
   },
   {
     id: "autoacceso",
@@ -491,7 +377,7 @@ const areas = [
     categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
     desc: "Sala de autoacceso para práctica de idiomas y aprendizaje autónomo con recursos digitales.",
     info: { "Uso": "Idiomas y autoaprendizaje", "Acceso": "Alumnos con credencial" },
-    x: 3, y: 42, w: 13, h: 8
+    x: 2.49, y: 51.13, w: 11.2, h: 8.91
   },
   {
     id: "idiomas",
@@ -501,7 +387,7 @@ const areas = [
     categoryColor: "#fce4ec", categoryText: "#c62828",
     desc: "Centro de aprendizaje de lenguas extranjeras y módulo de atención médica básica para la comunidad universitaria.",
     info: { "Idiomas": "Inglés, francés y otros", "Enfermería": "Atención básica de salud", "Horario": "Lun–Vie 8:00–16:00" },
-    x: 18, y: 42, w: 22, h: 8
+    x: 18.17, y: 51.28, w: 13.95, h: 8.3
   },
   {
     id: "carpinteria",
@@ -511,7 +397,7 @@ const areas = [
     categoryColor: "#efebe9", categoryText: "#4e342e",
     desc: "Taller de mantenimiento y construcción de mobiliario universitario. Personal de mantenimiento.",
     info: { "Acceso": "Personal de mantenimiento", "Función": "Mantenimiento del campus" },
-    x: 3, y: 53, w: 13, h: 8
+    x: 2.49, y: 62.89, w: 9.83, h: 7.7
   },
   {
     id: "sala_redes",
@@ -521,7 +407,7 @@ const areas = [
     categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
     desc: "Laboratorio especializado en redes de computadoras, telecomunicaciones y administración de sistemas.",
     info: { "Equipamiento": "Switches, routers, servidores", "Uso": "Prácticas de redes" },
-    x: 17, y: 53, w: 10, h: 8
+    x: 13.32, y: 62.89, w: 7.52, h: 7.39
   },
   {
     id: "sala_software",
@@ -531,7 +417,7 @@ const areas = [
     categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
     desc: "Laboratorio para desarrollo y prueba de software, programación y proyectos de ingeniería informática.",
     info: { "Software": "IDEs, herramientas de desarrollo", "Uso": "Programación y proyectos" },
-    x: 27, y: 53, w: 10, h: 8
+    x: 20.92, y: 62.89, w: 7.09, h: 7.54
   },
   {
     id: "sala3",
@@ -541,7 +427,7 @@ const areas = [
     categoryColor: "#f3e5f5", categoryText: "#6a1b9a",
     desc: "Tercera sala de cómputo general, disponible para uso académico de diversas carreras.",
     info: { "Capacidad": "~20 equipos", "Uso": "General académico" },
-    x: 17, y: 60, w: 20, h: 9
+    x: 13.66, y: 69.89, w: 14.18, h: 7.33
   },
   {
     id: "electronica",
@@ -551,7 +437,7 @@ const areas = [
     categoryColor: "#efebe9", categoryText: "#4e342e",
     desc: "Laboratorio de electrónica para prácticas de circuitos, sistemas embebidos y proyectos de ingeniería.",
     info: { "Equipamiento": "Osciloscopios, fuentes, componentes", "Uso": "Prácticas de electrónica" },
-    x: 13, y: 71, w: 16, h: 8
+    x: 13.51, y: 80.28, w: 11.46, h: 8.15
   },
   {
     id: "estatua",
@@ -561,7 +447,7 @@ const areas = [
     categoryColor: "#e8f5e9", categoryText: "#2e7d32",
     desc: "Punto de referencia icónico del campus universitario. Sirve como punto de encuentro entre estudiantes.",
     info: { "Función": "Punto de referencia del campus", "Ubicación": "Zona central" },
-    x: 37, y: 53, w: 10, h: 8
+    x: 33.06, y: 62.43, w: 7.95, h: 9.06
   },
   {
     id: "biblioteca",
@@ -571,7 +457,7 @@ const areas = [
     categoryColor: "#fce4ec", categoryText: "#c62828",
     desc: "Acervo bibliográfico y espacio de estudio. Cuenta con libros, revistas, bases de datos y salas de lectura.",
     info: { "Acervo": "Libros, revistas y recursos digitales", "Préstamos": "Con credencial vigente", "Horario": "Lun–Vie 8:00–20:00" },
-    x: 39.5, y: 87, w: 16, h: 10
+    x: 39.24, y: 87.15, w: 11.21, h: 9.24
   },
   {
     id: "casa_rector",
@@ -581,7 +467,7 @@ const areas = [
     categoryColor: "#fff8e1", categoryText: "#f57f17",
     desc: "Residencia oficial del rector universitario dentro del campus.",
     info: { "Acceso": "Restringido", "Uso": "Residencia oficial" },
-    x: 24, y: 87, w: 16, h: 10
+    x: 26.48, y: 87.15, w: 11.12, h: 9.09
   },
   {
     id: "habitaciones",
@@ -591,7 +477,7 @@ const areas = [
     categoryColor: "#e8f5e9", categoryText: "#2e7d32",
     desc: "Alojamiento temporal para docentes visitantes o de otras sedes que requieren hospedaje durante su estancia académica.",
     info: { "Acceso": "Docentes autorizados", "Uso": "Hospedaje temporal" },
-    x: 56, y: 87, w: 19, h: 10
+    x: 51.8, y: 87.46, w: 14.46, h: 8.94
   },
   {
     id: "sala_tesis",
@@ -601,7 +487,7 @@ const areas = [
     categoryColor: "#e0f7fa", categoryText: "#006064",
     desc: "Sala especializada para trabajo de titulación, asesorías de tesis y consulta de trabajos de investigación previos.",
     info: { "Uso": "Trabajo de titulación", "Acceso": "Alumnos en proceso de tesis", "Recursos": "Bibliografía especializada" },
-    x: 83.5, y: 35, w: 13, h: 12
+    x: 90.43, y: 38.04, w: 5.98, h: 10.17
   },
   {
     id: "sala_trabajo1",
@@ -611,7 +497,7 @@ const areas = [
     categoryColor: "#e0f7fa", categoryText: "#006064",
     desc: "Salas colaborativas para reuniones de equipos de trabajo, proyectos académicos y actividades grupales.",
     info: { "Capacidad": "~8 personas", "Reserva": "Con anticipación", "Uso": "Proyectos colaborativos" },
-    x: 78, y: 34, w: 14, h: 12
+    x: 83.31, y: 38.11, w: 5.95, h: 25.24
   },
   {
     id: "banos_sur",
@@ -621,7 +507,7 @@ const areas = [
     categoryColor: "#fce4ec", categoryText: "#c62828",
     desc: "Sanitarios en la zona sur del campus, próximos a las aulas y salas de trabajo.",
     info: { "Ubicación": "Zona sur", "Acceso": "Toda la comunidad" },
-    x: 83.5, y: 47, w: 13, h: 9
+    x: 90.25, y: 51.26, w: 5.89, h: 12.19
   },
   {
     id: "instituto",
@@ -631,7 +517,7 @@ const areas = [
     categoryColor: "#e0f7fa", categoryText: "#006064",
     desc: "Instituto especializado en derecho constitucional y administrativo. Realiza investigación jurídica y apoya la formación académica en ciencias jurídicas.",
     info: { "Área": "Derecho constitucional y administrativo", "Función": "Investigación jurídica", "Acceso": "Comunidad universitaria" },
-    x: 65, y: 72, w: 25, h: 14
+    x: 70.74, y: 68.5, w: 17.12, h: 12.63
   },
   {
     id: "aulas_bloque1",
@@ -641,7 +527,7 @@ const areas = [
     categoryColor: "#fff3e0", categoryText: "#e65100",
     desc: "Bloque inferior de aulas para clases presenciales. Equipadas con pizarrón, proyector y butacas.",
     info: { "Aulas": "1, 2, 3, 4, 5, 6, 7, 8", "Capacidad": "~35 alumnos c/u", "Equipamiento": "Proyector y pizarrón" },
-    x: 41, y: 59, w: 36, h: 15
+    x: 44.68, y: 49.87, w: 35.66, h: 13.78
   },
   {
     id: "aulas_bloque2",
@@ -651,7 +537,7 @@ const areas = [
     categoryColor: "#fff3e0", categoryText: "#e65100",
     desc: "Bloque intermedio de aulas. Uso para clases de distintas licenciaturas.",
     info: { "Aulas": "9, 10, 11, 12, 13, 14, 15, 16", "Capacidad": "~35 alumnos c/u", "Equipamiento": "Proyector y pizarrón" },
-    x: 41, y: 43, w: 36, h: 15
+    x: 44.68, y: 37.37, w: 35.74, h: 12.57
   },
   {
     id: "aulas_bloque3",
@@ -661,7 +547,7 @@ const areas = [
     categoryColor: "#fff3e0", categoryText: "#e65100",
     desc: "Bloque superior de aulas, zona norte del edificio principal.",
     info: { "Aulas": "17, 18, 20, 21, 22, 23, 24", "Capacidad": "~35 alumnos c/u", "Equipamiento": "Proyector y pizarrón" },
-    x: 41, y: 27, w: 36, h: 15
+    x: 45.02, y: 24.11, w: 35.32, h: 13.33
   }
 ];
 
@@ -840,355 +726,4 @@ function openPanel(area) {
 closeBtn.addEventListener('click', () => overlay.classList.remove('open'));
 overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') overlay.classList.remove('open'); });
-</script>
-<script>
-const editorMapWrapper = document.getElementById('mapWrapper');
-const editorMapImg = document.getElementById('mapImg');
-const editorHotspotsContainer = document.getElementById('hotspotsContainer');
-const editorOverlay = document.getElementById('overlay');
-const editorToggleBtn = document.getElementById('toggleEditorBtn');
-const editorSaveBtn = document.getElementById('saveLayoutBtn');
-const editorResetBtn = document.getElementById('resetLayoutBtn');
-const editorStatusText = document.getElementById('editorStatus');
-
-const editorOriginalAreas = areas.map(area => ({
-  ...area,
-  info: area.info ? { ...area.info } : undefined
-}));
-
-const editorState = {
-  enabled: false,
-  activePointerId: null,
-  activeAreaId: null,
-  dragMode: null,
-  startPointer: null,
-  startArea: null,
-  panZoomBound: false
-};
-
-function editorClamp(value, min, max) {
-  return Math.min(max, Math.max(min, value));
-}
-
-function editorFindArea(areaId) {
-  return areas.find(area => area.id === areaId);
-}
-
-function editorSetStatus(message) {
-  editorStatusText.textContent = message;
-}
-
-function editorSyncButtons() {
-  editorToggleBtn.classList.toggle('is-active', editorState.enabled);
-  editorToggleBtn.textContent = editorState.enabled ? 'Salir de edición' : 'Editar recuadros';
-  editorSaveBtn.disabled = !editorState.enabled;
-  editorResetBtn.disabled = !editorState.enabled;
-  editorMapWrapper.classList.toggle('is-editing', editorState.enabled);
-}
-
-function editorRenderHotspots() {
-  editorHotspotsContainer.innerHTML = '';
-
-  areas.forEach(area => {
-    const hotspot = document.createElement('div');
-    hotspot.className = 'hotspot';
-    hotspot.style.left = area.x + '%';
-    hotspot.style.top = area.y + '%';
-    hotspot.style.width = area.w + '%';
-    hotspot.style.height = area.h + '%';
-    hotspot.setAttribute('title', area.label);
-
-    if (editorState.enabled) {
-      if (editorState.activeAreaId === area.id) {
-        hotspot.classList.add('is-selected');
-      }
-
-      const label = document.createElement('span');
-      label.className = 'hotspot-label';
-      label.textContent = area.label;
-
-      const handle = document.createElement('span');
-      handle.className = 'hotspot-handle';
-      handle.dataset.handle = 'resize';
-
-      hotspot.appendChild(label);
-      hotspot.appendChild(handle);
-
-      hotspot.addEventListener('pointerdown', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-
-        editorState.activeAreaId = area.id;
-        editorState.activePointerId = event.pointerId;
-        editorState.dragMode = event.target.dataset.handle === 'resize' ? 'resize' : 'move';
-        editorState.startPointer = { x: event.clientX, y: event.clientY };
-        editorState.startArea = { x: area.x, y: area.y, w: area.w, h: area.h };
-
-        editorSetStatus(`Editando "${area.label}": arrastra para ${editorState.dragMode === 'move' ? 'mover' : 'cambiar tamaño'}.`);
-        editorRenderHotspots();
-      });
-    } else {
-      hotspot.addEventListener('click', () => openPanel(area));
-    }
-
-    editorHotspotsContainer.appendChild(hotspot);
-  });
-}
-
-function renderHotspots() {
-  editorRenderHotspots();
-}
-
-function openPanel(area) {
-  if (editorState.enabled) return;
-
-  document.getElementById('pIcon').textContent = area.icon;
-  document.getElementById('pIcon').style.background = area.categoryColor;
-  document.getElementById('pTitle').textContent = area.label;
-  const badge = document.getElementById('pBadge');
-  badge.textContent = area.category;
-  badge.style.background = area.categoryColor;
-  badge.style.color = area.categoryText;
-  document.getElementById('pDesc').textContent = area.desc;
-
-  const rows = document.getElementById('pRows');
-  rows.innerHTML = '';
-  if (area.info) {
-    Object.entries(area.info).forEach(([key, value]) => {
-      const row = document.createElement('div');
-      row.className = 'info-row';
-      row.innerHTML = `<span class="info-label">${key}</span><span class="info-value">${value}</span>`;
-      rows.appendChild(row);
-    });
-  }
-
-  editorOverlay.classList.add('open');
-}
-
-function editorEndDrag() {
-  editorState.activePointerId = null;
-  editorState.dragMode = null;
-  editorState.startPointer = null;
-  editorState.startArea = null;
-}
-
-function editorUpdateAreaFromPointer(event) {
-  const area = editorFindArea(editorState.activeAreaId);
-  const rect = editorHotspotsContainer.getBoundingClientRect();
-  if (!area || !rect.width || !rect.height || !editorState.startPointer || !editorState.startArea) return;
-
-  const deltaX = ((event.clientX - editorState.startPointer.x) / rect.width) * 100;
-  const deltaY = ((event.clientY - editorState.startPointer.y) / rect.height) * 100;
-  const minSize = 1.5;
-
-  if (editorState.dragMode === 'move') {
-    area.x = editorClamp(editorState.startArea.x + deltaX, 0, 100 - area.w);
-    area.y = editorClamp(editorState.startArea.y + deltaY, 0, 100 - area.h);
-  } else if (editorState.dragMode === 'resize') {
-    area.w = editorClamp(editorState.startArea.w + deltaX, minSize, 100 - area.x);
-    area.h = editorClamp(editorState.startArea.h + deltaY, minSize, 100 - area.y);
-  }
-}
-
-function editorToggleMode(forceValue) {
-  editorState.enabled = typeof forceValue === 'boolean' ? forceValue : !editorState.enabled;
-  editorState.activeAreaId = null;
-  editorEndDrag();
-  editorOverlay.classList.remove('open');
-  editorSyncButtons();
-  editorRenderHotspots();
-
-  if (editorState.enabled) {
-    editorSetStatus('Modo edición activo: arrastra un recuadro para moverlo y usa el punto naranja para cambiar su tamaño.');
-  } else {
-    editorSetStatus('Modo normal: toca cualquier área para ver su información.');
-  }
-}
-
-function editorDownloadLayout() {
-  const payload = {
-    exportedAt: new Date().toISOString(),
-    areas: areas.map(({ id, label, x, y, w, h }) => ({
-      id,
-      label,
-      x: Number(x.toFixed(2)),
-      y: Number(y.toFixed(2)),
-      w: Number(w.toFixed(2)),
-      h: Number(h.toFixed(2))
-    }))
-  };
-
-  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'hotspots-layout.json';
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
-
-  editorSetStatus('Se descargó hotspots-layout.json con las posiciones actuales de los recuadros.');
-}
-
-function editorRestoreLayout() {
-  areas.forEach((area, index) => {
-    area.x = editorOriginalAreas[index].x;
-    area.y = editorOriginalAreas[index].y;
-    area.w = editorOriginalAreas[index].w;
-    area.h = editorOriginalAreas[index].h;
-  });
-
-  editorRenderHotspots();
-  editorSetStatus('Se restauraron las coordenadas originales del archivo.');
-}
-
-function initPanZoom() {
-  if (editorState.panZoomBound) return;
-  editorState.panZoomBound = true;
-
-  const viewport = document.getElementById('mapViewport');
-  const maxScale = 3;
-  let minScale = 1;
-  let scale = 1;
-  let lastScale = 1;
-  let startDist = 0;
-  let translate = { x: 0, y: 0 };
-  let lastTouch = null;
-
-  function getBaseSize() {
-    return {
-      width: viewport.offsetWidth,
-      height: viewport.offsetHeight
-    };
-  }
-
-  function isPortraitViewport() {
-    return window.matchMedia('(orientation: portrait)').matches;
-  }
-
-  function clampScale(nextScale) {
-    return Math.min(maxScale, Math.max(minScale, nextScale));
-  }
-
-  function clampTranslate(nextTranslate) {
-    const { width: baseWidth, height: baseHeight } = getBaseSize();
-    const scaledWidth = baseWidth * scale;
-    const scaledHeight = baseHeight * scale;
-    const maxX = Math.max(0, (scaledWidth - editorMapWrapper.clientWidth) / 2);
-    const maxY = Math.max(0, (scaledHeight - editorMapWrapper.clientHeight) / 2);
-
-    return {
-      x: Math.min(maxX, Math.max(-maxX, nextTranslate.x)),
-      y: Math.min(maxY, Math.max(-maxY, nextTranslate.y))
-    };
-  }
-
-  function setTransform() {
-    translate = clampTranslate(translate);
-    viewport.style.transform = `translate(${translate.x}px, ${translate.y}px) scale(${scale})`;
-  }
-
-  function resetView() {
-    viewport.style.transform = 'translate(0px, 0px) scale(1)';
-    const { width: baseWidth, height: baseHeight } = getBaseSize();
-    if (!baseWidth || !baseHeight) return;
-
-    const fitWidthScale = editorMapWrapper.clientWidth / baseWidth;
-    const fitHeightScale = editorMapWrapper.clientHeight / baseHeight;
-    minScale = isPortraitViewport() ? Math.max(1, fitHeightScale) : Math.max(1, fitWidthScale);
-    scale = minScale;
-    lastScale = scale;
-    translate = { x: 0, y: 0 };
-    setTransform();
-  }
-
-  viewport.addEventListener('touchstart', (event) => {
-    if (editorState.enabled) return;
-
-    if (event.touches.length === 2) {
-      startDist = Math.hypot(
-        event.touches[0].clientX - event.touches[1].clientX,
-        event.touches[0].clientY - event.touches[1].clientY
-      );
-      lastScale = scale;
-    } else if (event.touches.length === 1) {
-      lastTouch = {
-        x: event.touches[0].clientX - translate.x,
-        y: event.touches[0].clientY - translate.y
-      };
-    }
-  }, { passive: false });
-
-  viewport.addEventListener('touchmove', (event) => {
-    if (editorState.enabled) return;
-
-    if (event.touches.length === 2) {
-      event.preventDefault();
-      const currentDistance = Math.hypot(
-        event.touches[0].clientX - event.touches[1].clientX,
-        event.touches[0].clientY - event.touches[1].clientY
-      );
-      const delta = currentDistance / startDist;
-      scale = clampScale(lastScale * delta);
-      setTransform();
-    } else if (event.touches.length === 1 && lastTouch) {
-      event.preventDefault();
-      translate = {
-        x: event.touches[0].clientX - lastTouch.x,
-        y: event.touches[0].clientY - lastTouch.y
-      };
-      setTransform();
-    }
-  }, { passive: false });
-
-  viewport.addEventListener('touchend', () => {
-    if (editorState.enabled) return;
-    lastTouch = null;
-  });
-
-  editorMapWrapper.addEventListener('wheel', (event) => {
-    if (editorState.enabled) return;
-    if (event.ctrlKey || event.metaKey || event.altKey) return;
-    event.preventDefault();
-    scale = clampScale(scale + (-event.deltaY * 0.001));
-    setTransform();
-  }, { passive: false });
-
-  window.addEventListener('resize', resetView);
-  resetView();
-}
-
-window.addEventListener('pointermove', (event) => {
-  if (!editorState.enabled || editorState.activePointerId !== event.pointerId || !editorState.activeAreaId) return;
-  event.preventDefault();
-  editorUpdateAreaFromPointer(event);
-  editorRenderHotspots();
-});
-
-window.addEventListener('pointerup', (event) => {
-  if (editorState.activePointerId !== event.pointerId) return;
-  editorEndDrag();
-});
-
-window.addEventListener('pointercancel', (event) => {
-  if (editorState.activePointerId !== event.pointerId) return;
-  editorEndDrag();
-});
-
-editorToggleBtn.addEventListener('click', () => editorToggleMode());
-editorSaveBtn.addEventListener('click', editorDownloadLayout);
-editorResetBtn.addEventListener('click', editorRestoreLayout);
-
-editorMapImg.onload = () => {
-  editorRenderHotspots();
-  initPanZoom();
-};
-
-if (editorMapImg.complete) {
-  editorRenderHotspots();
-  initPanZoom();
-}
-
-editorSyncButtons();
 </script>
