@@ -176,17 +176,25 @@ body { font-family: var(--font-sans, sans-serif); }
 .panel-media {
   border-radius: 16px;
   overflow: hidden;
-  background: #f8fafc;
+  background: #e5e7eb;
   margin-bottom: 18px;
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
 }
 
 .panel-image {
   width: 100%;
-  height: 240px;
-  object-fit: cover;
+  height: auto;
+  max-height: min(52vh, 420px);
+  aspect-ratio: 3 / 4;
+  object-fit: contain;
   display: block;
   background: #e2e8f0;
+  transition: opacity 0.18s ease;
+  image-rendering: auto;
+}
+
+.panel-image.is-loading {
+  opacity: 0.35;
 }
 
 .panel-media .no-media {
@@ -208,7 +216,7 @@ body { font-family: var(--font-sans, sans-serif); }
 .panel-thumb {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   border-radius: 12px;
   border: 2px solid transparent;
@@ -222,6 +230,7 @@ body { font-family: var(--font-sans, sans-serif); }
   height: 100%;
   object-fit: cover;
   display: block;
+  image-rendering: auto;
 }
 
 .panel-thumb.active {
@@ -630,35 +639,35 @@ const areas = [
 ];
 
 const imageGallery = {
-  auditorio: ['images/auditorio/auditorio_0152.HEIC','images/auditorio/auditorio_0153.HEIC','images/auditorio/auditorio_0154.HEIC','images/auditorio/auditorio_0155.HEIC','images/auditorio/auditorio_0156.HEIC','images/auditorio/auditorio_0157.HEIC'],
-  aulas_bloque1: ['images/aulas_bloque1/aulas_bloque1_0053.HEIC','images/aulas_bloque1/aulas_bloque1_0054.HEIC','images/aulas_bloque1/aulas_bloque1_0055.HEIC','images/aulas_bloque1/aulas_bloque1_0056.HEIC','images/aulas_bloque1/aulas_bloque1_0057.HEIC','images/aulas_bloque1/aulas_bloque1_0058.HEIC','images/aulas_bloque1/aulas_bloque1_0059.HEIC','images/aulas_bloque1/aulas_bloque1_0060.HEIC','images/aulas_bloque1/aulas_bloque1_0061.HEIC','images/aulas_bloque1/aulas_bloque1_0062.HEIC','images/aulas_bloque1/aulas_bloque1_0063.HEIC'],
-  aulas_bloque2: ['images/aulas_bloque2/aulas_bloque2_0092.HEIC','images/aulas_bloque2/aulas_bloque2_0093.HEIC','images/aulas_bloque2/aulas_bloque2_0094.HEIC','images/aulas_bloque2/aulas_bloque2_0095.HEIC','images/aulas_bloque2/aulas_bloque2_0096.HEIC','images/aulas_bloque2/aulas_bloque2_0097.HEIC','images/aulas_bloque2/aulas_bloque2_0098.HEIC','images/aulas_bloque2/aulas_bloque2_0099.HEIC','images/aulas_bloque2/aulas_bloque2_0100.HEIC','images/aulas_bloque2/aulas_bloque2_0101.HEIC','images/aulas_bloque2/aulas_bloque2_0102.HEIC','images/aulas_bloque2/aulas_bloque2_0103.HEIC','images/aulas_bloque2/aulas_bloque2_0105.HEIC'],
-  aulas_bloque3: ['images/aulas_bloque3/aulas_bloque3_0127.HEIC','images/aulas_bloque3/aulas_bloque3_0128.HEIC','images/aulas_bloque3/aulas_bloque3_0129.HEIC','images/aulas_bloque3/aulas_bloque3_0130.HEIC','images/aulas_bloque3/aulas_bloque3_0131.HEIC','images/aulas_bloque3/aulas_bloque3_0132.HEIC','images/aulas_bloque3/aulas_bloque3_0133.HEIC','images/aulas_bloque3/aulas_bloque3_0134.HEIC','images/aulas_bloque3/aulas_bloque3_0135.HEIC','images/aulas_bloque3/aulas_bloque3_0136.HEIC','images/aulas_bloque3/aulas_bloque3_0137.HEIC','images/aulas_bloque3/aulas_bloque3_0138.HEIC','images/aulas_bloque3/aulas_bloque3_0139.HEIC','images/aulas_bloque3/aulas_bloque3_0140.HEIC','images/aulas_bloque3/aulas_bloque3_0141.HEIC','images/aulas_bloque3/aulas_bloque3_0142.HEIC'],
-  autoacceso: ['images/autoacceso/autoacceso_0072.HEIC','images/autoacceso/autoacceso_0073.HEIC','images/autoacceso/autoacceso_0074.HEIC'],
-  banos_norte: ['images/banos_norte/banos_norte_0121.HEIC','images/banos_norte/banos_norte_0122.HEIC','images/banos_norte/banos_norte_0123.HEIC'],
-  banos_sur: ['images/banos_sur/banos_sur_0162.HEIC','images/banos_sur/banos_sur_0163.HEIC','images/banos_sur/banos_sur_0164.HEIC'],
-  biblioteca: ['images/biblioteca/biblioteca_0044.HEIC','images/biblioteca/biblioteca_0047.HEIC'],
-  bodega: ['images/bodega/bodega_0158.HEIC','images/bodega/bodega_0159.HEIC','images/bodega/bodega_0160.HEIC','images/bodega/bodega_0161.HEIC'],
-  cafeteria: ['images/cafeteria/cafeteria_0106.HEIC','images/cafeteria/cafeteria_0107.HEIC','images/cafeteria/cafeteria_0108.HEIC','images/cafeteria/cafeteria_0109.HEIC','images/cafeteria/cafeteria_0110.HEIC'],
-  carpinteria: ['images/carpinteria/carpinteria_0069.HEIC','images/carpinteria/carpinteria_0070.HEIC','images/carpinteria/carpinteria_0071.HEIC'],
-  casa_rector: ['images/casa_rector/casa_rector_0188.HEIC','images/casa_rector/casa_rector_0190.HEIC','images/casa_rector/casa_rector_0191.HEIC'],
-  cubos: ['images/cubos/cubos_0118.HEIC','images/cubos/cubos_0119.HEIC','images/cubos/cubos_0120.HEIC'],
-  electronica: ['images/electronica/electronica_0043.HEIC'],
-  estacionamiento: ['images/estacionamiento/estacionamiento_0111.HEIC','images/estacionamiento/estacionamiento_0112.HEIC','images/estacionamiento/estacionamiento_0113.HEIC','images/estacionamiento/estacionamiento_0114.HEIC','images/estacionamiento/estacionamiento_0115.HEIC','images/estacionamiento/estacionamiento_0116.HEIC','images/estacionamiento/estacionamiento_0117.HEIC'],
-  estatua: ['images/estatua/estatua_0064.HEIC','images/estatua/estatua_0065.HEIC','images/estatua/estatua_0066.HEIC','images/estatua/estatua_0067.HEIC','images/estatua/estatua_0068.HEIC'],
-  habitaciones: ['images/habitaciones/habitaciones_0175.HEIC','images/habitaciones/habitaciones_0182.HEIC','images/habitaciones/habitaciones_0183.HEIC','images/habitaciones/habitaciones_0184.HEIC','images/habitaciones/habitaciones_0185.HEIC','images/habitaciones/habitaciones_0186.HEIC','images/habitaciones/habitaciones_0187.HEIC'],
-  idiomas: ['images/idiomas/idiomas_0084.HEIC','images/idiomas/idiomas_0085.HEIC','images/idiomas/idiomas_0086.HEIC','images/idiomas/idiomas_0087.HEIC','images/idiomas/idiomas_0088.HEIC','images/idiomas/idiomas_0090.HEIC'],
-  instituto: ['images/instituto/instituto_0048.HEIC','images/instituto/instituto_0050.HEIC','images/instituto/instituto_0052.HEIC'],
-  rectoria: ['images/rectoria/rectoria_0149.HEIC','images/rectoria/rectoria_0150.HEIC'],
-  sala1: ['images/sala1/sala1_0080.HEIC','images/sala1/sala1_0081.HEIC','images/sala1/sala1_0083.HEIC'],
-  sala2: ['images/sala2/sala2_0076.HEIC','images/sala2/sala2_0078.HEIC','images/sala2/sala2_0079.HEIC'],
-  sala3: ['images/sala3/sala3_0039.HEIC','images/sala3/sala3_0040.HEIC','images/sala3/sala3_0041.HEIC','images/sala3/sala3_0042.HEIC'],
-  sala_redes: ['images/sala_redes/sala_redes_0037.HEIC'],
-  sala_software: ['images/sala_software/sala_software_0035.HEIC','images/sala_software/sala_software_0036.HEIC'],
-  sala_tesis: ['images/sala_tesis/sala_tesis_0169.HEIC','images/sala_tesis/sala_tesis_0170.HEIC'],
-  sala_trabajo1: ['images/sala_trabajo1/sala_trabajo1_0165.HEIC','images/sala_trabajo1/sala_trabajo1_0167.HEIC','images/sala_trabajo1/sala_trabajo1_0173.HEIC'],
-  servicios: ['images/servicios/servicios_0151.HEIC'],
-  vicerrectoria: ['images/vicerrectoria/vicerrectoria_0143.HEIC','images/vicerrectoria/vicerrectoria_0144.HEIC','images/vicerrectoria/vicerrectoria_0146.HEIC','images/vicerrectoria/vicerrectoria_0147.HEIC']
+  auditorio: ['images/auditorio/auditorio_0152.jpg','images/auditorio/auditorio_0153.jpg','images/auditorio/auditorio_0154.jpg','images/auditorio/auditorio_0155.jpg','images/auditorio/auditorio_0156.jpg','images/auditorio/auditorio_0157.jpg'],
+  aulas_bloque1: ['images/aulas_bloque1/aulas_bloque1_0053.jpg','images/aulas_bloque1/aulas_bloque1_0054.jpg','images/aulas_bloque1/aulas_bloque1_0055.jpg','images/aulas_bloque1/aulas_bloque1_0056.jpg','images/aulas_bloque1/aulas_bloque1_0057.jpg','images/aulas_bloque1/aulas_bloque1_0058.jpg','images/aulas_bloque1/aulas_bloque1_0059.jpg','images/aulas_bloque1/aulas_bloque1_0060.jpg','images/aulas_bloque1/aulas_bloque1_0061.jpg','images/aulas_bloque1/aulas_bloque1_0062.jpg','images/aulas_bloque1/aulas_bloque1_0063.jpg'],
+  aulas_bloque2: ['images/aulas_bloque2/aulas_bloque2_0092.jpg','images/aulas_bloque2/aulas_bloque2_0093.jpg','images/aulas_bloque2/aulas_bloque2_0094.jpg','images/aulas_bloque2/aulas_bloque2_0095.jpg','images/aulas_bloque2/aulas_bloque2_0096.jpg','images/aulas_bloque2/aulas_bloque2_0097.jpg','images/aulas_bloque2/aulas_bloque2_0098.jpg','images/aulas_bloque2/aulas_bloque2_0099.jpg','images/aulas_bloque2/aulas_bloque2_0100.jpg','images/aulas_bloque2/aulas_bloque2_0101.jpg','images/aulas_bloque2/aulas_bloque2_0102.jpg','images/aulas_bloque2/aulas_bloque2_0103.jpg','images/aulas_bloque2/aulas_bloque2_0105.jpg'],
+  aulas_bloque3: ['images/aulas_bloque3/aulas_bloque3_0127.jpg','images/aulas_bloque3/aulas_bloque3_0128.jpg','images/aulas_bloque3/aulas_bloque3_0129.jpg','images/aulas_bloque3/aulas_bloque3_0130.jpg','images/aulas_bloque3/aulas_bloque3_0131.jpg','images/aulas_bloque3/aulas_bloque3_0132.jpg','images/aulas_bloque3/aulas_bloque3_0133.jpg','images/aulas_bloque3/aulas_bloque3_0134.jpg','images/aulas_bloque3/aulas_bloque3_0135.jpg','images/aulas_bloque3/aulas_bloque3_0136.jpg','images/aulas_bloque3/aulas_bloque3_0137.jpg','images/aulas_bloque3/aulas_bloque3_0138.jpg','images/aulas_bloque3/aulas_bloque3_0139.jpg','images/aulas_bloque3/aulas_bloque3_0140.jpg','images/aulas_bloque3/aulas_bloque3_0141.jpg','images/aulas_bloque3/aulas_bloque3_0142.jpg'],
+  autoacceso: ['images/autoacceso/autoacceso_0072.jpg','images/autoacceso/autoacceso_0073.jpg','images/autoacceso/autoacceso_0074.jpg'],
+  banos_norte: ['images/banos_norte/banos_norte_0121.jpg','images/banos_norte/banos_norte_0122.jpg','images/banos_norte/banos_norte_0123.jpg'],
+  banos_sur: ['images/banos_sur/banos_sur_0162.jpg','images/banos_sur/banos_sur_0163.jpg','images/banos_sur/banos_sur_0164.jpg'],
+  biblioteca: ['images/biblioteca/biblioteca_0044.jpg','images/biblioteca/biblioteca_0047.jpg'],
+  bodega: ['images/bodega/bodega_0158.jpg','images/bodega/bodega_0159.jpg','images/bodega/bodega_0160.jpg','images/bodega/bodega_0161.jpg'],
+  cafeteria: ['images/cafeteria/cafeteria_0106.jpg','images/cafeteria/cafeteria_0107.jpg','images/cafeteria/cafeteria_0108.jpg','images/cafeteria/cafeteria_0109.jpg','images/cafeteria/cafeteria_0110.jpg'],
+  carpinteria: ['images/carpinteria/carpinteria_0069.jpg','images/carpinteria/carpinteria_0070.jpg','images/carpinteria/carpinteria_0071.jpg'],
+  casa_rector: ['images/casa_rector/casa_rector_0188.jpg','images/casa_rector/casa_rector_0190.jpg','images/casa_rector/casa_rector_0191.jpg'],
+  cubos: ['images/cubos/cubos_0118.jpg','images/cubos/cubos_0119.jpg','images/cubos/cubos_0120.jpg'],
+  electronica: ['images/electronica/electronica_0043.jpg'],
+  estacionamiento: ['images/estacionamiento/estacionamiento_0111.jpg','images/estacionamiento/estacionamiento_0112.jpg','images/estacionamiento/estacionamiento_0113.jpg','images/estacionamiento/estacionamiento_0114.jpg','images/estacionamiento/estacionamiento_0115.jpg','images/estacionamiento/estacionamiento_0116.jpg','images/estacionamiento/estacionamiento_0117.jpg'],
+  estatua: ['images/estatua/estatua_0064.jpg','images/estatua/estatua_0065.jpg','images/estatua/estatua_0066.jpg','images/estatua/estatua_0067.jpg','images/estatua/estatua_0068.jpg'],
+  habitaciones: ['images/habitaciones/habitaciones_0175.jpg','images/habitaciones/habitaciones_0182.jpg','images/habitaciones/habitaciones_0183.jpg','images/habitaciones/habitaciones_0184.jpg','images/habitaciones/habitaciones_0185.jpg','images/habitaciones/habitaciones_0186.jpg','images/habitaciones/habitaciones_0187.jpg'],
+  idiomas: ['images/idiomas/idiomas_0084.jpg','images/idiomas/idiomas_0085.jpg','images/idiomas/idiomas_0086.jpg','images/idiomas/idiomas_0087.jpg','images/idiomas/idiomas_0088.jpg','images/idiomas/idiomas_0090.jpg'],
+  instituto: ['images/instituto/instituto_0048.jpg','images/instituto/instituto_0050.jpg','images/instituto/instituto_0052.jpg'],
+  rectoria: ['images/rectoria/rectoria_0149.jpg','images/rectoria/rectoria_0150.jpg'],
+  sala1: ['images/sala1/sala1_0080.jpg','images/sala1/sala1_0081.jpg','images/sala1/sala1_0083.jpg'],
+  sala2: ['images/sala2/sala2_0076.jpg','images/sala2/sala2_0078.jpg','images/sala2/sala2_0079.jpg'],
+  sala3: ['images/sala3/sala3_0039.jpg','images/sala3/sala3_0040.jpg','images/sala3/sala3_0041.jpg','images/sala3/sala3_0042.jpg'],
+  sala_redes: ['images/sala_redes/sala_redes_0037.jpg'],
+  sala_software: ['images/sala_software/sala_software_0035.jpg','images/sala_software/sala_software_0036.jpg'],
+  sala_tesis: ['images/sala_tesis/sala_tesis_0169.jpg','images/sala_tesis/sala_tesis_0170.jpg'],
+  sala_trabajo1: ['images/sala_trabajo1/sala_trabajo1_0165.jpg','images/sala_trabajo1/sala_trabajo1_0167.jpg','images/sala_trabajo1/sala_trabajo1_0173.jpg'],
+  servicios: ['images/servicios/servicios_0151.jpg'],
+  vicerrectoria: ['images/vicerrectoria/vicerrectoria_0143.jpg','images/vicerrectoria/vicerrectoria_0144.jpg','images/vicerrectoria/vicerrectoria_0146.jpg','images/vicerrectoria/vicerrectoria_0147.jpg']
 };
 
 const mapWrapper = document.getElementById('mapWrapper');
