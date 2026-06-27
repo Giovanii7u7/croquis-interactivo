@@ -1,0 +1,237 @@
+{
+  "exportedAt": "2026-06-27T05:35:16.742Z",
+  "areas": [
+    {
+      "id": "auditorio",
+      "label": "Auditorio",
+      "x": 3.13,
+      "y": 4.59,
+      "w": 10.21,
+      "h": 10.39
+    },
+    {
+      "id": "rectoria",
+      "label": "Rectoría",
+      "x": 14.21,
+      "y": 4.74,
+      "w": 10.01,
+      "h": 9.94
+    },
+    {
+      "id": "servicios",
+      "label": "Servicios Escolares",
+      "x": 25.49,
+      "y": 5.65,
+      "w": 9.61,
+      "h": 8.87
+    },
+    {
+      "id": "vicerrectoria",
+      "label": "Vicerrectoría",
+      "x": 13.22,
+      "y": 17.87,
+      "w": 22.01,
+      "h": 10.85
+    },
+    {
+      "id": "estacionamiento",
+      "label": "Estacionamiento",
+      "x": 51.23,
+      "y": 4.89,
+      "w": 14.1,
+      "h": 9.33
+    },
+    {
+      "id": "cafeteria",
+      "label": "Cafetería",
+      "x": 82.4,
+      "y": 11.74,
+      "w": 8.61,
+      "h": 13.57
+    },
+    {
+      "id": "bodega",
+      "label": "Bodega",
+      "x": 90.54,
+      "y": 26.56,
+      "w": 6.03,
+      "h": 9.76
+    },
+    {
+      "id": "banos_norte",
+      "label": "Baños",
+      "x": 46.5,
+      "y": 15.74,
+      "w": 7.83,
+      "h": 5.33
+    },
+    {
+      "id": "cubos",
+      "label": "Cubos de Profesores",
+      "x": 38.26,
+      "y": 4.74,
+      "w": 10.17,
+      "h": 9.02
+    },
+    {
+      "id": "sala1",
+      "label": "Sala 1",
+      "x": 21.17,
+      "y": 34.41,
+      "w": 7.26,
+      "h": 8.24
+    },
+    {
+      "id": "sala2",
+      "label": "Sala 2",
+      "x": 6.8,
+      "y": 34.56,
+      "w": 7.09,
+      "h": 8.09
+    },
+    {
+      "id": "autoacceso",
+      "label": "Auto Acceso",
+      "x": 2.49,
+      "y": 51.13,
+      "w": 11.2,
+      "h": 8.91
+    },
+    {
+      "id": "idiomas",
+      "label": "Centro de Idiomas / Enfermería",
+      "x": 18.17,
+      "y": 51.28,
+      "w": 13.95,
+      "h": 8.3
+    },
+    {
+      "id": "carpinteria",
+      "label": "Carpintería",
+      "x": 2.49,
+      "y": 62.89,
+      "w": 9.83,
+      "h": 7.7
+    },
+    {
+      "id": "sala_redes",
+      "label": "Sala de Redes",
+      "x": 13.32,
+      "y": 62.89,
+      "w": 7.52,
+      "h": 7.39
+    },
+    {
+      "id": "sala_software",
+      "label": "Sala de Software",
+      "x": 20.92,
+      "y": 62.89,
+      "w": 7.09,
+      "h": 7.54
+    },
+    {
+      "id": "sala3",
+      "label": "Sala 3",
+      "x": 13.66,
+      "y": 69.89,
+      "w": 14.18,
+      "h": 7.33
+    },
+    {
+      "id": "electronica",
+      "label": "Electrónica",
+      "x": 13.51,
+      "y": 80.28,
+      "w": 11.46,
+      "h": 8.15
+    },
+    {
+      "id": "estatua",
+      "label": "Estatua",
+      "x": 33.06,
+      "y": 62.43,
+      "w": 7.95,
+      "h": 9.06
+    },
+    {
+      "id": "biblioteca",
+      "label": "Biblioteca",
+      "x": 39.24,
+      "y": 87.15,
+      "w": 11.21,
+      "h": 9.24
+    },
+    {
+      "id": "casa_rector",
+      "label": "Casa del Rector",
+      "x": 26.48,
+      "y": 87.15,
+      "w": 11.12,
+      "h": 9.09
+    },
+    {
+      "id": "habitaciones",
+      "label": "Habitaciones de Profesores",
+      "x": 51.8,
+      "y": 87.46,
+      "w": 14.46,
+      "h": 8.94
+    },
+    {
+      "id": "sala_tesis",
+      "label": "Sala de Tesis",
+      "x": 90.43,
+      "y": 38.04,
+      "w": 5.98,
+      "h": 10.17
+    },
+    {
+      "id": "sala_trabajo1",
+      "label": "Sala de Trabajo en Equipo",
+      "x": 83.31,
+      "y": 38.11,
+      "w": 5.95,
+      "h": 25.24
+    },
+    {
+      "id": "banos_sur",
+      "label": "Baños (zona sur)",
+      "x": 90.25,
+      "y": 51.26,
+      "w": 5.89,
+      "h": 12.19
+    },
+    {
+      "id": "instituto",
+      "label": "Instituto de Estudios Constitucionales",
+      "x": 70.74,
+      "y": 68.5,
+      "w": 17.12,
+      "h": 12.63
+    },
+    {
+      "id": "aulas_bloque1",
+      "label": "Aulas 1–8",
+      "x": 44.68,
+      "y": 49.87,
+      "w": 35.66,
+      "h": 13.78
+    },
+    {
+      "id": "aulas_bloque2",
+      "label": "Aulas 9–16",
+      "x": 44.68,
+      "y": 37.37,
+      "w": 35.74,
+      "h": 12.57
+    },
+    {
+      "id": "aulas_bloque3",
+      "label": "Aulas 17–24",
+      "x": 45.02,
+      "y": 24.11,
+      "w": 35.32,
+      "h": 13.33
+    }
+  ]
+}

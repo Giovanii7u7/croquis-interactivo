@@ -126,10 +126,62 @@ button, .panel-close { font-family: inherit; font-weight: 600; }
   color: #14213d;
   border-radius: 18px;
   padding: 22px;
-  max-width: 440px;
-  width: 100%;
+  max-width: 840px;
+  width: min(95vw, 840px);
   border: 1px solid rgba(15, 23, 42, 0.08);
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.28);
+}
+
+#panelOverview {
+  display: grid;
+  gap: 18px;
+}
+
+@media (min-width: 960px) {
+  #panelOverview {
+    grid-template-columns: 1.4fr 1fr;
+    align-items: start;
+    gap: 24px;
+  }
+
+  .panel-media {
+    grid-column: 1 / 2;
+  }
+
+  .panel-media,
+  .desc-text,
+  #pRows {
+    min-width: 0;
+  }
+
+  .panel-media {
+    margin-bottom: 0;
+  }
+
+  .desc-text {
+    grid-column: 1 / 2;
+    margin-bottom: 0;
+  }
+
+  #pRows {
+    grid-column: 2 / 3;
+    padding-left: 18px;
+    border-left: 1px solid rgba(148, 163, 184, 0.18);
+  }
+
+  .panel-media .panel-image-viewport {
+    max-height: 260px;
+  }
+
+  .panel-gallery {
+    gap: 10px;
+    padding: 8px 0 0;
+  }
+
+  .panel-thumb {
+    width: 72px;
+    flex-basis: 72px;
+  }
 }
 
 .panel-header {
@@ -182,7 +234,7 @@ button, .panel-close { font-family: inherit; font-weight: 600; }
   border-radius: 16px;
   overflow: hidden;
   background: #e5e7eb;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
 }
 
@@ -306,7 +358,7 @@ button, .panel-close { font-family: inherit; font-weight: 600; }
   font-size: 12px;
   padding: 6px 12px;
   border-radius: 20px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   font-weight: 700;
 }
 
@@ -327,6 +379,171 @@ button, .panel-close { font-family: inherit; font-weight: 600; }
   color: #334155;
   line-height: 1.7;
   margin-bottom: 18px;
+}
+
+.panel-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 14px 0 16px;
+}
+
+.panel-tab {
+  flex: 1;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 999px;
+  background: #f8fafc;
+  padding: 10px 14px;
+  color: #334155;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.panel-tab:hover {
+  background: white;
+}
+
+.panel-tab-active {
+  background: #1d4ed8;
+  color: white;
+  border-color: rgba(29, 78, 216, 0.8);
+}
+
+.panel-tab-panel {
+  display: block;
+}
+
+.panel-tab-panel-hidden {
+  display: none !important;
+}
+
+.comments-section {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
+.comments-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.comments-section-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.comments-subtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin-top: 4px;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.comment-card {
+  padding: 12px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.comment-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.comment-author {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.comment-body {
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.comment-empty {
+  padding: 12px;
+  border: 1px dashed rgba(148, 163, 184, 0.4);
+  border-radius: 12px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+  background: #f8fafc;
+}
+
+.comment-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.comment-form input,
+.comment-form textarea {
+  width: 100%;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 10px;
+  padding: 10px 12px;
+  font: inherit;
+  color: #0f172a;
+  background: #fff;
+}
+
+.comment-form textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.comment-form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.comment-submit {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: #1d4ed8;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.comment-submit:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.comment-status {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.comment-status.success {
+  color: #2e7d32;
+}
+
+.comment-status.error {
+  color: #c62828;
 }
 
 @media (max-width: 640px) {
@@ -394,18 +611,45 @@ button, .panel-close { font-family: inherit; font-weight: 600; }
       <button class="panel-close" id="closeBtn" aria-label="Cerrar">×</button>
     </div>
     <span class="panel-badge" id="pBadge"></span>
-    <div class="panel-media" id="pMedia">
-      <div class="panel-image-viewport" id="pImageViewport">
-        <img id="pMainImage" class="panel-image" src="" alt="" />
-      </div>
-      <div class="no-media" id="pNoMedia">No hay imágenes disponibles para esta área.</div>
-      <div class="panel-gallery" id="pGallery"></div>
+    <div class="panel-tabs" role="tablist" aria-label="Secciones del panel">
+      <button class="panel-tab panel-tab-active" id="tabOverview" type="button" role="tab" aria-selected="true">Información</button>
+      <button class="panel-tab" id="tabComments" type="button" role="tab" aria-selected="false">Comentarios</button>
     </div>
-    <p class="desc-text" id="pDesc"></p>
-    <div id="pRows"></div>
+    <div class="panel-tab-panel" id="panelOverview">
+      <div class="panel-media" id="pMedia">
+        <div class="panel-image-viewport" id="pImageViewport">
+          <img id="pMainImage" class="panel-image" src="" alt="" />
+        </div>
+        <div class="no-media" id="pNoMedia">No hay imágenes disponibles para esta área.</div>
+        <div class="panel-gallery" id="pGallery"></div>
+      </div>
+      <p class="desc-text" id="pDesc"></p>
+      <div id="pRows"></div>
+    </div>
+    <div class="panel-tab-panel panel-tab-panel-hidden" id="panelComments">
+      <div class="comments-section" id="commentsSection">
+        <div class="comments-section-header">
+          <div>
+            <div class="comments-section-title">Comentarios</div>
+            <div class="comments-subtitle">Tu opinión ayuda a conocer mejor este espacio.</div>
+          </div>
+          <span class="panel-badge" style="margin: 0; background: #eff6ff; color: #2563eb;">Revisión semanal</span>
+        </div>
+        <div class="comments-list" id="commentsList"></div>
+        <form class="comment-form" id="commentForm">
+          <input id="commentAuthor" name="authorName" type="text" maxlength="60" placeholder="Tu nombre" required />
+          <textarea id="commentBody" name="body" maxlength="500" placeholder="Escribe tu comentario..." required></textarea>
+          <div class="comment-form-actions">
+            <div class="comment-status" id="commentStatus">Los comentarios se publican tras revisión semanal.</div>
+            <button class="comment-submit" id="commentSubmit" type="submit">Publicar comentario</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const areas = [
   {
@@ -739,6 +983,28 @@ const overlay = document.getElementById('overlay');
 const closeBtn = document.getElementById('closeBtn');
 const imageViewport = document.getElementById('pImageViewport');
 const mainPanelImage = document.getElementById('pMainImage');
+const tabOverview = document.getElementById('tabOverview');
+const tabComments = document.getElementById('tabComments');
+const panelOverview = document.getElementById('panelOverview');
+const panelComments = document.getElementById('panelComments');
+const commentsList = document.getElementById('commentsList');
+const commentForm = document.getElementById('commentForm');
+const commentAuthor = document.getElementById('commentAuthor');
+const commentBody = document.getElementById('commentBody');
+const commentStatus = document.getElementById('commentStatus');
+const commentSubmit = document.getElementById('commentSubmit');
+const SUPABASE_URL = 'https://rzphrkwkmdwvzmfbzdhf.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2VGeHD9j35dNx45Nii2hNw__efMcCjX';
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false
+  }
+});
+const supabaseState = {
+  connected: false,
+  lastError: null
+};
 const touchInteractionState = {
   startX: 0,
   startY: 0,
@@ -760,10 +1026,206 @@ const modalZoomState = {
   pinchStartDistance: 0,
   pinchStartScale: 1
 };
+let activeCommentsAreaId = null;
+let activeCommentsRequestId = 0;
 
 function clampValue(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
+
+async function verifySupabaseConnection() {
+  const { error } = await supabaseClient
+    .from('areas')
+    .select('id', { head: true, count: 'exact' })
+    .limit(1);
+
+  if (error) {
+    supabaseState.connected = false;
+    supabaseState.lastError = error;
+    console.error('Supabase connection check failed:', error.message);
+    return false;
+  }
+
+  supabaseState.connected = true;
+  supabaseState.lastError = null;
+  console.info('Supabase connected successfully.');
+  return true;
+}
+
+async function fetchApprovedComments(areaId) {
+  const { data, error } = await supabaseClient
+    .from('approved_comments')
+    .select('id, area_id, area_label, author_name, body, created_at')
+    .eq('area_id', areaId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error loading approved comments:', error.message);
+    throw error;
+  }
+
+  return data ?? [];
+}
+
+async function submitPendingComment({ areaId, authorName, body }) {
+  const payload = {
+    area_id: areaId,
+    author_name: authorName.trim(),
+    body: body.trim(),
+    status: 'pending'
+  };
+
+  const { data, error } = await supabaseClient
+    .from('comments')
+    .insert(payload)
+    .select('id, area_id, author_name, body, status, created_at')
+    .single();
+
+  if (error) {
+    console.error('Error submitting comment:', error.message);
+    throw error;
+  }
+
+  return data;
+}
+
+window.croquisSupabase = {
+  client: supabaseClient,
+  state: supabaseState,
+  verifyConnection: verifySupabaseConnection,
+  fetchApprovedComments,
+  submitPendingComment
+};
+
+function setCommentStatus(message, type = 'info') {
+  if (!commentStatus) return;
+  commentStatus.textContent = message;
+  commentStatus.className = `comment-status${type && type !== 'info' ? ` ${type}` : ''}`;
+}
+
+function setCommentFormBusy(isBusy) {
+  if (!commentSubmit || !commentAuthor || !commentBody) return;
+  commentSubmit.disabled = isBusy;
+  commentAuthor.disabled = isBusy;
+  commentBody.disabled = isBusy;
+}
+
+function formatCommentDate(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  return new Intl.DateTimeFormat('es-MX', {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  }).format(date);
+}
+
+function renderComments(comments) {
+  if (!commentsList) return;
+
+  commentsList.innerHTML = '';
+  if (!comments.length) {
+    commentsList.innerHTML = '<div class="comment-empty">Aún no hay comentarios publicados para este espacio.</div>';
+    return;
+  }
+
+  const fragment = document.createDocumentFragment();
+  comments.forEach((comment) => {
+    const card = document.createElement('article');
+    card.className = 'comment-card';
+    card.innerHTML = `
+      <div class="comment-meta">
+        <span class="comment-author">${comment.author_name}</span>
+        <span>${formatCommentDate(comment.created_at)}</span>
+      </div>
+      <div class="comment-body">${comment.body}</div>
+    `;
+    fragment.appendChild(card);
+  });
+
+  commentsList.appendChild(fragment);
+}
+
+async function loadAreaComments(areaId) {
+  if (!commentsList) return;
+
+  activeCommentsRequestId += 1;
+  const requestId = activeCommentsRequestId;
+  activeCommentsAreaId = areaId;
+
+  commentsList.innerHTML = '<div class="comment-empty">Cargando comentarios…</div>';
+  setCommentStatus('Cargando comentarios…');
+
+  try {
+    const comments = await fetchApprovedComments(areaId);
+    if (requestId !== activeCommentsRequestId || activeCommentsAreaId !== areaId) return;
+    renderComments(comments);
+    setCommentStatus(comments.length ? `Hay ${comments.length} comentario${comments.length === 1 ? '' : 's'} publicado${comments.length === 1 ? '' : 's'}.` : 'Aún no hay comentarios publicados para este espacio.');
+  } catch (error) {
+    if (requestId !== activeCommentsRequestId || activeCommentsAreaId !== areaId) return;
+    commentsList.innerHTML = '<div class="comment-empty">No fue posible cargar los comentarios en este momento.</div>';
+    setCommentStatus('No fue posible cargar los comentarios. Intenta más tarde.', 'error');
+  }
+}
+
+async function handleCommentSubmit(event) {
+  event.preventDefault();
+  if (!activeCommentsAreaId) return;
+
+  const authorName = commentAuthor?.value.trim() || '';
+  const body = commentBody?.value.trim() || '';
+
+  if (authorName.length < 2 || body.length < 3) {
+    setCommentStatus('Escribe tu nombre y un comentario con al menos 3 caracteres.', 'error');
+    return;
+  }
+
+  setCommentFormBusy(true);
+  setCommentStatus('Enviando comentario…');
+
+  try {
+    await submitPendingComment({
+      areaId: activeCommentsAreaId,
+      authorName,
+      body
+    });
+    if (commentForm) commentForm.reset();
+    setCommentStatus('Tu comentario se recibió y se publicará tras revisión semanal.', 'success');
+    await loadAreaComments(activeCommentsAreaId);
+  } catch (error) {
+    setCommentStatus('No se pudo enviar el comentario. Intenta más tarde.', 'error');
+  } finally {
+    setCommentFormBusy(false);
+  }
+}
+
+if (commentForm) {
+  commentForm.addEventListener('submit', handleCommentSubmit);
+}
+
+function setActivePanelTab(tabId) {
+  if (!tabOverview || !tabComments || !panelOverview || !panelComments) return;
+
+  const activeTab = tabId === 'comments' ? tabComments : tabOverview;
+  const inactiveTab = tabId === 'comments' ? tabOverview : tabComments;
+  const showPanel = tabId === 'comments' ? panelComments : panelOverview;
+  const hidePanel = tabId === 'comments' ? panelOverview : panelComments;
+
+  activeTab.classList.add('panel-tab-active');
+  activeTab.setAttribute('aria-selected', 'true');
+  inactiveTab.classList.remove('panel-tab-active');
+  inactiveTab.setAttribute('aria-selected', 'false');
+
+  showPanel.classList.remove('panel-tab-panel-hidden');
+  hidePanel.classList.add('panel-tab-panel-hidden');
+}
+
+if (tabOverview) tabOverview.addEventListener('click', () => setActivePanelTab('overview'));
+if (tabComments) tabComments.addEventListener('click', () => {
+  setActivePanelTab('comments');
+  if (activeCommentsAreaId) {
+    void loadAreaComments(activeCommentsAreaId);
+  }
+});
 
 function clampModalImageTranslate() {
   const extraX = Math.max(0, (imageViewport.clientWidth * modalZoomState.scale - imageViewport.clientWidth) / 2);
@@ -1078,6 +1540,12 @@ function renderHotspots(natW, natH) {
 }
 
 function openPanel(area) {
+  activeCommentsAreaId = area.id;
+  if (commentForm) commentForm.reset();
+  setCommentFormBusy(false);
+  setCommentStatus('Los comentarios se publican tras revisión semanal.');
+  setActivePanelTab('overview');
+
   document.getElementById('pIcon').textContent = area.icon;
   document.getElementById('pIcon').style.background = area.categoryColor;
   document.getElementById('pTitle').textContent = area.label;
@@ -1139,6 +1607,8 @@ function openPanel(area) {
       rows.appendChild(row);
     });
   }
+
+  void loadAreaComments(area.id);
   overlay.classList.add('open');
 }
 
@@ -1158,4 +1628,5 @@ document.addEventListener('keydown', e => {
     overlay.classList.remove('open');
   }
 });
+verifySupabaseConnection().catch(() => {});
 </script>
