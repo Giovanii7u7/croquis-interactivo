@@ -121,6 +121,107 @@ button, .panel-close { font-family: inherit; font-weight: 600; }
 }
 .panel-overlay.open { display: flex; }
 
+.confirm-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 16, 28, 0.58);
+  z-index: 1100;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.confirm-modal-overlay.open { display: flex; }
+
+.confirm-modal {
+  background: #ffffff;
+  color: #14213d;
+  border-radius: 18px;
+  padding: 26px;
+  max-width: 460px;
+  width: min(100%, 460px);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.24);
+}
+
+@media (max-width: 640px) {
+  .confirm-modal {
+    padding: 22px;
+    width: min(100%, 92vw);
+  }
+
+  .confirm-modal-title {
+    font-size: 24px;
+  }
+
+  .confirm-modal-body {
+    font-size: 18px;
+  }
+
+  .comment-confirm-button {
+    width: 100%;
+    padding: 14px 18px;
+    font-size: 17px;
+  }
+}
+
+.confirm-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.confirm-modal-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.confirm-modal-close {
+  background: #f3f6fb;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  color: #334155;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 22px;
+}
+.confirm-modal-close:hover {
+  background: #e2e8f0;
+}
+
+.confirm-modal-body {
+  color: #334155;
+  line-height: 1.85;
+  font-size: 17px;
+}
+
+.confirm-modal-actions {
+  margin-top: 24px;
+  text-align: right;
+}
+
+.comment-confirm-button {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.comment-confirm-button:hover {
+  background: #1d4ed8;
+}
+
 .panel {
   background: #ffffff;
   color: #14213d;
@@ -649,6 +750,21 @@ button, .panel-close { font-family: inherit; font-weight: 600; }
   </div>
 </div>
 
+<div class="confirm-modal-overlay" id="commentConfirmModal" aria-hidden="true">
+  <div class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="commentConfirmTitle">
+    <div class="confirm-modal-header">
+      <div class="confirm-modal-title" id="commentConfirmTitle">Comentario enviado</div>
+      <button type="button" class="confirm-modal-close" id="commentConfirmClose" aria-label="Cerrar">×</button>
+    </div>
+    <div class="confirm-modal-body">
+      <p>Tu mensaje se recibió correctamente y se publicará una vez revisado por un moderador.</p>
+    </div>
+    <div class="confirm-modal-actions">
+      <button type="button" class="comment-confirm-button" id="commentConfirmOk">Aceptar</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const areas = [
@@ -993,6 +1109,9 @@ const commentAuthor = document.getElementById('commentAuthor');
 const commentBody = document.getElementById('commentBody');
 const commentStatus = document.getElementById('commentStatus');
 const commentSubmit = document.getElementById('commentSubmit');
+const commentConfirmModal = document.getElementById('commentConfirmModal');
+const commentConfirmClose = document.getElementById('commentConfirmClose');
+const commentConfirmOk = document.getElementById('commentConfirmOk');
 const SUPABASE_URL = 'https://rzphrkwkmdwvzmfbzdhf.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2VGeHD9j35dNx45Nii2hNw__efMcCjX';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
@@ -1077,9 +1196,7 @@ async function submitPendingComment({ areaId, authorName, body }) {
 
   const { data, error } = await supabaseClient
     .from('comments')
-    .insert(payload)
-    .select('id, area_id, author_name, body, status, created_at')
-    .single();
+    .insert(payload);
 
   if (error) {
     console.error('Error submitting comment:', error.message);
@@ -1087,6 +1204,74 @@ async function submitPendingComment({ areaId, authorName, body }) {
   }
 
   return data;
+}
+
+function getOrCreateVisitorId() {
+  let visitorId = localStorage.getItem('visitor_id');
+  if (!visitorId) {
+    visitorId = window.crypto?.randomUUID ? crypto.randomUUID() : `visitor-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    localStorage.setItem('visitor_id', visitorId);
+  }
+  return visitorId;
+}
+
+function detectBrowser(userAgent) {
+  const ua = userAgent.toLowerCase();
+  if (/edg\//.test(ua)) return 'Edge';
+  if (/opr\//.test(ua) || /opera/.test(ua)) return 'Opera';
+  if (/chrome\//.test(ua) && !/chromium/.test(ua)) return 'Chrome';
+  if (/firefox\//.test(ua)) return 'Firefox';
+  if (/safari\//.test(ua) && !/chrome\//.test(ua)) return 'Safari';
+  if (/msie|trident/.test(ua)) return 'Internet Explorer';
+  return 'Desconocido';
+}
+
+function detectOS(userAgent) {
+  const ua = userAgent.toLowerCase();
+  if (/windows nt/.test(ua)) return 'Windows';
+  if (/mac os x/.test(ua) || /macintosh/.test(ua)) return 'macOS';
+  if (/android/.test(ua)) return 'Android';
+  if (/iphone|ipad|ipod/.test(ua)) return 'iOS';
+  if (/linux/.test(ua)) return 'Linux';
+  return 'Desconocido';
+}
+
+async function insertPageVisit() {
+  const visitorId = getOrCreateVisitorId();
+  const userAgent = navigator.userAgent || '';
+  const page = window.location.pathname || '/';
+  const language = navigator.language || '';
+  const screenWidth = window.screen.width || null;
+  const screenHeight = window.screen.height || null;
+  const referrer = document.referrer && document.referrer !== '' ? document.referrer : 'Directo';
+  const deviceType = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) ? 'Móvil' : 'PC';
+  const browser = detectBrowser(userAgent);
+  const os = detectOS(userAgent);
+
+  const { error } = await supabaseClient
+    .from('page_visits')
+    .insert({
+      visitor_id: visitorId,
+      page,
+      device_type: deviceType,
+      browser,
+      os,
+      language,
+      screen_width: screenWidth,
+      screen_height: screenHeight,
+      user_agent: userAgent,
+      referrer
+    });
+
+  if (error) {
+    console.warn('No se pudo registrar la visita:', error.message);
+  }
+}
+
+function registerPageVisitOnLoad() {
+  window.addEventListener('load', () => {
+    void insertPageVisit();
+  });
 }
 
 window.croquisSupabase = {
@@ -1109,6 +1294,32 @@ function setCommentFormBusy(isBusy) {
   commentAuthor.disabled = isBusy;
   commentBody.disabled = isBusy;
 }
+
+function showCommentConfirmationModal() {
+  if (!commentConfirmModal) return;
+  commentConfirmModal.classList.add('open');
+  commentConfirmModal.setAttribute('aria-hidden', 'false');
+}
+
+function closeCommentConfirmationModal() {
+  if (!commentConfirmModal) return;
+  commentConfirmModal.classList.remove('open');
+  commentConfirmModal.setAttribute('aria-hidden', 'true');
+}
+
+if (commentConfirmClose) commentConfirmClose.addEventListener('click', closeCommentConfirmationModal);
+if (commentConfirmOk) commentConfirmOk.addEventListener('click', closeCommentConfirmationModal);
+if (commentConfirmModal) {
+  commentConfirmModal.addEventListener('click', e => {
+    if (e.target === commentConfirmModal) closeCommentConfirmationModal();
+  });
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeCommentConfirmationModal();
+  }
+});
 
 function formatCommentDate(value) {
   if (!value) return '';
@@ -1190,6 +1401,7 @@ async function handleCommentSubmit(event) {
     });
     if (commentForm) commentForm.reset();
     setCommentStatus('Tu comentario se recibió y se publicará tras revisión semanal.', 'success');
+    showCommentConfirmationModal();
     await loadAreaComments(activeCommentsAreaId);
   } catch (error) {
     setCommentStatus('No se pudo enviar el comentario. Intenta más tarde.', 'error');
@@ -1268,9 +1480,23 @@ function zoomModalImage(nextScale, originX, originY) {
 function setMainPanelImage(src, alt) {
   resetModalImageZoom();
   mainPanelImage.classList.add('is-loading');
-  mainPanelImage.src = src;
   mainPanelImage.alt = alt;
   mainPanelImage.style.display = 'block';
+  mainPanelImage.decoding = 'async';
+  mainPanelImage.loading = 'eager';
+  mainPanelImage.fetchPriority = 'high';
+
+  const preloadImage = new Image();
+  preloadImage.decoding = 'async';
+  preloadImage.src = src;
+  preloadImage.onload = () => {
+    mainPanelImage.src = src;
+    mainPanelImage.classList.remove('is-loading');
+  };
+  preloadImage.onerror = () => {
+    mainPanelImage.src = src;
+    mainPanelImage.classList.remove('is-loading');
+  };
 }
 
 const imgSrc = 'images/croquis.jpeg';
@@ -1577,6 +1803,8 @@ function openPanel(area) {
       const thumbImg = document.createElement('img');
       thumbImg.src = src;
       thumbImg.alt = `${area.label} miniatura ${index + 1}`;
+      thumbImg.loading = 'lazy';
+      thumbImg.decoding = 'async';
       thumbImg.onerror = () => {
         thumbImg.style.display = 'none';
       };
@@ -1628,5 +1856,6 @@ document.addEventListener('keydown', e => {
     overlay.classList.remove('open');
   }
 });
+registerPageVisitOnLoad();
 verifySupabaseConnection().catch(() => {});
 </script>
