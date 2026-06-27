@@ -181,16 +181,36 @@ body { font-family: var(--font-sans, sans-serif); }
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
 }
 
-.panel-image {
+.panel-image-viewport {
+  position: relative;
   width: 100%;
-  height: auto;
   max-height: min(52vh, 420px);
   aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: #dbe1e8;
+  touch-action: none;
+  cursor: grab;
+}
+
+.panel-image-viewport.is-zoomed {
+  cursor: move;
+}
+
+.panel-image-viewport.is-dragging {
+  cursor: grabbing;
+}
+
+.panel-image {
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   display: block;
   background: #e2e8f0;
-  transition: opacity 0.18s ease;
+  transition: opacity 0.18s ease, transform 0.12s ease-out;
   image-rendering: auto;
+  transform-origin: center center;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .panel-image.is-loading {
@@ -271,7 +291,8 @@ body { font-family: var(--font-sans, sans-serif); }
 }
 
 .panel-media.no-images .panel-gallery,
-.panel-media.no-images .panel-image {
+.panel-media.no-images .panel-image,
+.panel-media.no-images .panel-image-viewport {
   display: none;
 }
 
@@ -315,7 +336,7 @@ body { font-family: var(--font-sans, sans-serif); }
     padding: 18px 18px 22px;
   }
 
-  .panel-image {
+  .panel-image-viewport {
     max-height: min(42vh, 360px);
   }
 
@@ -369,7 +390,9 @@ body { font-family: var(--font-sans, sans-serif); }
     </div>
     <span class="panel-badge" id="pBadge"></span>
     <div class="panel-media" id="pMedia">
-      <img id="pMainImage" class="panel-image" src="" alt="" />
+      <div class="panel-image-viewport" id="pImageViewport">
+        <img id="pMainImage" class="panel-image" src="" alt="" />
+      </div>
       <div class="no-media" id="pNoMedia">No hay imágenes disponibles para esta área.</div>
       <div class="panel-gallery" id="pGallery"></div>
     </div>
@@ -709,6 +732,8 @@ const mapImg = document.getElementById('mapImg');
 const hotspotsContainer = document.getElementById('hotspotsContainer');
 const overlay = document.getElementById('overlay');
 const closeBtn = document.getElementById('closeBtn');
+const imageViewport = document.getElementById('pImageViewport');
+const mainPanelImage = document.getElementById('pMainImage');
 const touchInteractionState = {
   startX: 0,
   startY: 0,
@@ -716,6 +741,70 @@ const touchInteractionState = {
   multitouch: false,
   suppressClickUntil: 0
 };
+const modalZoomState = {
+  scale: 1,
+  minScale: 1,
+  maxScale: 4,
+  translateX: 0,
+  translateY: 0,
+  dragPointerId: null,
+  dragStartX: 0,
+  dragStartY: 0,
+  dragOriginX: 0,
+  dragOriginY: 0,
+  pinchStartDistance: 0,
+  pinchStartScale: 1
+};
+
+function clampValue(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function clampModalImageTranslate() {
+  const extraX = Math.max(0, (imageViewport.clientWidth * modalZoomState.scale - imageViewport.clientWidth) / 2);
+  const extraY = Math.max(0, (imageViewport.clientHeight * modalZoomState.scale - imageViewport.clientHeight) / 2);
+  modalZoomState.translateX = clampValue(modalZoomState.translateX, -extraX, extraX);
+  modalZoomState.translateY = clampValue(modalZoomState.translateY, -extraY, extraY);
+}
+
+function updateModalImageTransform() {
+  clampModalImageTranslate();
+  mainPanelImage.style.transform = `translate(${modalZoomState.translateX}px, ${modalZoomState.translateY}px) scale(${modalZoomState.scale})`;
+  imageViewport.classList.toggle('is-zoomed', modalZoomState.scale > 1.01);
+}
+
+function resetModalImageZoom() {
+  modalZoomState.scale = 1;
+  modalZoomState.translateX = 0;
+  modalZoomState.translateY = 0;
+  modalZoomState.dragPointerId = null;
+  modalZoomState.pinchStartDistance = 0;
+  imageViewport.classList.remove('is-dragging');
+  updateModalImageTransform();
+}
+
+function zoomModalImage(nextScale, originX, originY) {
+  const clampedScale = clampValue(nextScale, modalZoomState.minScale, modalZoomState.maxScale);
+  const previousScale = modalZoomState.scale;
+  if (clampedScale === previousScale) return;
+
+  const offsetX = originX - imageViewport.clientWidth / 2;
+  const offsetY = originY - imageViewport.clientHeight / 2;
+  const ratio = clampedScale / previousScale;
+
+  modalZoomState.translateX = (modalZoomState.translateX - offsetX) * ratio + offsetX;
+  modalZoomState.translateY = (modalZoomState.translateY - offsetY) * ratio + offsetY;
+  modalZoomState.scale = clampedScale;
+  updateModalImageTransform();
+}
+
+function setMainPanelImage(src, alt) {
+  resetModalImageZoom();
+  mainPanelImage.classList.add('is-loading');
+  mainPanelImage.src = src;
+  mainPanelImage.alt = alt;
+  mainPanelImage.style.display = 'block';
+}
 
 const imgSrc = 'images/croquis.jpeg';
 mapImg.src = imgSrc;
@@ -735,6 +824,99 @@ mapImg.onload = () => {
   renderHotspots(mapImg.naturalWidth, mapImg.naturalHeight);
   initPanZoom();
 };
+
+mainPanelImage.addEventListener('load', () => {
+  mainPanelImage.classList.remove('is-loading');
+  resetModalImageZoom();
+});
+
+imageViewport.addEventListener('wheel', (event) => {
+  if (!mainPanelImage.src || mainPanelImage.style.display === 'none') return;
+  event.preventDefault();
+  const rect = imageViewport.getBoundingClientRect();
+  const originX = event.clientX - rect.left;
+  const originY = event.clientY - rect.top;
+  const delta = -event.deltaY * 0.0015;
+  zoomModalImage(modalZoomState.scale + delta, originX, originY);
+}, { passive: false });
+
+imageViewport.addEventListener('pointerdown', (event) => {
+  if (event.pointerType === 'touch' || modalZoomState.scale <= 1.01) return;
+  event.preventDefault();
+  modalZoomState.dragPointerId = event.pointerId;
+  modalZoomState.dragStartX = event.clientX;
+  modalZoomState.dragStartY = event.clientY;
+  modalZoomState.dragOriginX = modalZoomState.translateX;
+  modalZoomState.dragOriginY = modalZoomState.translateY;
+  imageViewport.classList.add('is-dragging');
+});
+
+window.addEventListener('pointermove', (event) => {
+  if (modalZoomState.dragPointerId !== event.pointerId) return;
+  event.preventDefault();
+  modalZoomState.translateX = modalZoomState.dragOriginX + (event.clientX - modalZoomState.dragStartX);
+  modalZoomState.translateY = modalZoomState.dragOriginY + (event.clientY - modalZoomState.dragStartY);
+  updateModalImageTransform();
+});
+
+window.addEventListener('pointerup', (event) => {
+  if (modalZoomState.dragPointerId !== event.pointerId) return;
+  modalZoomState.dragPointerId = null;
+  imageViewport.classList.remove('is-dragging');
+});
+
+window.addEventListener('pointercancel', (event) => {
+  if (modalZoomState.dragPointerId !== event.pointerId) return;
+  modalZoomState.dragPointerId = null;
+  imageViewport.classList.remove('is-dragging');
+});
+
+imageViewport.addEventListener('touchstart', (event) => {
+  if (event.touches.length === 2) {
+    modalZoomState.pinchStartDistance = Math.hypot(
+      event.touches[0].clientX - event.touches[1].clientX,
+      event.touches[0].clientY - event.touches[1].clientY
+    );
+    modalZoomState.pinchStartScale = modalZoomState.scale;
+  }
+}, { passive: false });
+
+imageViewport.addEventListener('touchmove', (event) => {
+  if (!mainPanelImage.src || mainPanelImage.style.display === 'none') return;
+
+  if (event.touches.length === 2) {
+    event.preventDefault();
+    const currentDistance = Math.hypot(
+      event.touches[0].clientX - event.touches[1].clientX,
+      event.touches[0].clientY - event.touches[1].clientY
+    );
+    const rect = imageViewport.getBoundingClientRect();
+    const originX = ((event.touches[0].clientX + event.touches[1].clientX) / 2) - rect.left;
+    const originY = ((event.touches[0].clientY + event.touches[1].clientY) / 2) - rect.top;
+    const ratio = currentDistance / (modalZoomState.pinchStartDistance || currentDistance);
+    zoomModalImage(modalZoomState.pinchStartScale * ratio, originX, originY);
+  } else if (event.touches.length === 1 && modalZoomState.scale > 1.01) {
+    event.preventDefault();
+    const touch = event.touches[0];
+    if (!imageViewport.dataset.touchDragX) {
+      imageViewport.dataset.touchDragX = String(touch.clientX);
+      imageViewport.dataset.touchDragY = String(touch.clientY);
+      imageViewport.dataset.touchOriginX = String(modalZoomState.translateX);
+      imageViewport.dataset.touchOriginY = String(modalZoomState.translateY);
+    }
+    modalZoomState.translateX = Number(imageViewport.dataset.touchOriginX) + (touch.clientX - Number(imageViewport.dataset.touchDragX));
+    modalZoomState.translateY = Number(imageViewport.dataset.touchOriginY) + (touch.clientY - Number(imageViewport.dataset.touchDragY));
+    updateModalImageTransform();
+  }
+}, { passive: false });
+
+imageViewport.addEventListener('touchend', () => {
+  delete imageViewport.dataset.touchDragX;
+  delete imageViewport.dataset.touchDragY;
+  delete imageViewport.dataset.touchOriginX;
+  delete imageViewport.dataset.touchOriginY;
+  modalZoomState.pinchStartDistance = 0;
+}, { passive: true });
 
 // Simple pan & pinch-to-zoom implementation for web
 function initPanZoom() {
@@ -907,14 +1089,13 @@ function openPanel(area) {
 
   gallery.innerHTML = '';
   if (imageList.length > 0) {
-    mainImage.src = imageList[0];
-    mainImage.alt = `${area.label} - imagen`;
     mainImage.onerror = () => {
       mainImage.style.display = 'none';
       noMedia.style.display = 'grid';
+      resetModalImageZoom();
     };
     noMedia.style.display = 'none';
-    mainImage.style.display = 'block';
+    setMainPanelImage(imageList[0], `${area.label} - imagen`);
 
     imageList.forEach((src, index) => {
       const thumb = document.createElement('button');
@@ -928,10 +1109,8 @@ function openPanel(area) {
       };
       thumb.appendChild(thumbImg);
       thumb.addEventListener('click', () => {
-        mainImage.src = src;
-        mainImage.alt = `${area.label} - imagen`;
-        mainImage.style.display = 'block';
         noMedia.style.display = 'none';
+        setMainPanelImage(src, `${area.label} - imagen`);
         gallery.querySelectorAll('.panel-thumb').forEach(btn => btn.classList.remove('active'));
         thumb.classList.add('active');
       });
@@ -942,6 +1121,7 @@ function openPanel(area) {
     mainImage.alt = `Sin imagen disponible`;
     mainImage.style.display = 'none';
     noMedia.style.display = 'grid';
+    resetModalImageZoom();
   }
 
   const rows = document.getElementById('pRows');
@@ -957,7 +1137,20 @@ function openPanel(area) {
   overlay.classList.add('open');
 }
 
-closeBtn.addEventListener('click', () => overlay.classList.remove('open'));
-overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') overlay.classList.remove('open'); });
+closeBtn.addEventListener('click', () => {
+  resetModalImageZoom();
+  overlay.classList.remove('open');
+});
+overlay.addEventListener('click', e => {
+  if (e.target === overlay) {
+    resetModalImageZoom();
+    overlay.classList.remove('open');
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    resetModalImageZoom();
+    overlay.classList.remove('open');
+  }
+});
 </script>
