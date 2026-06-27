@@ -42,6 +42,50 @@ body { font-family: var(--font-sans, sans-serif); }
   gap: 6px;
 }
 
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.editor-btn {
+  appearance: none;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.editor-btn:hover,
+.editor-btn:active {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.editor-btn.is-active {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #ffffff;
+}
+
+.editor-btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.editor-status {
+  font-size: 12px;
+  color: #475569;
+  margin-bottom: 10px;
+  min-height: 18px;
+}
+
 .map-wrapper {
   position: relative;
   width: 100%;
@@ -100,6 +144,61 @@ body { font-family: var(--font-sans, sans-serif); }
 }
 .hotspot:active {
   background: rgba(255,255,255,0.4);
+}
+
+.map-wrapper.is-editing {
+  cursor: default;
+}
+
+.map-wrapper.is-editing .hotspot {
+  background: rgba(59, 130, 246, 0.14);
+  border: 2px solid rgba(37, 99, 235, 0.95);
+  border-radius: 8px;
+  overflow: visible;
+}
+
+.map-wrapper.is-editing .hotspot.is-selected {
+  border-color: #f97316;
+  background: rgba(249, 115, 22, 0.16);
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.9);
+}
+
+.hotspot-label,
+.hotspot-handle {
+  display: none;
+}
+
+.map-wrapper.is-editing .hotspot-label,
+.map-wrapper.is-editing .hotspot-handle {
+  display: block;
+}
+
+.hotspot-label {
+  position: absolute;
+  top: -30px;
+  left: 0;
+  background: rgba(15, 23, 42, 0.92);
+  color: #ffffff;
+  padding: 5px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.hotspot-handle {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  right: -9px;
+  bottom: -9px;
+  background: #f97316;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.3);
+  cursor: nwse-resize;
 }
 
 .panel-overlay {
@@ -202,6 +301,15 @@ body { font-family: var(--font-sans, sans-serif); }
 }
 
 @media (max-width: 640px) {
+  .editor-toolbar {
+    gap: 8px;
+  }
+
+  .editor-btn {
+    flex: 1 1 150px;
+    justify-content: center;
+  }
+
   .panel-overlay {
     align-items: flex-end;
     padding: 12px;
@@ -233,6 +341,13 @@ body { font-family: var(--font-sans, sans-serif); }
       <i class="ti ti-hand-click" aria-hidden="true"></i>
       Toca cualquier área del mapa para ver su información
     </div>
+
+    <div class="editor-toolbar">
+      <button class="editor-btn" id="toggleEditorBtn" type="button">Editar recuadros</button>
+      <button class="editor-btn" id="saveLayoutBtn" type="button" disabled>Guardar JSON</button>
+      <button class="editor-btn" id="resetLayoutBtn" type="button" disabled>Restaurar</button>
+    </div>
+    <div class="editor-status" id="editorStatus">Modo normal: toca cualquier Ã¡rea para ver su informaciÃ³n.</div>
 
     <div class="map-wrapper" id="mapWrapper">
           <div id="mapViewport" style="touch-action: none;">
@@ -725,4 +840,355 @@ function openPanel(area) {
 closeBtn.addEventListener('click', () => overlay.classList.remove('open'));
 overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('open'); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') overlay.classList.remove('open'); });
+</script>
+<script>
+const editorMapWrapper = document.getElementById('mapWrapper');
+const editorMapImg = document.getElementById('mapImg');
+const editorHotspotsContainer = document.getElementById('hotspotsContainer');
+const editorOverlay = document.getElementById('overlay');
+const editorToggleBtn = document.getElementById('toggleEditorBtn');
+const editorSaveBtn = document.getElementById('saveLayoutBtn');
+const editorResetBtn = document.getElementById('resetLayoutBtn');
+const editorStatusText = document.getElementById('editorStatus');
+
+const editorOriginalAreas = areas.map(area => ({
+  ...area,
+  info: area.info ? { ...area.info } : undefined
+}));
+
+const editorState = {
+  enabled: false,
+  activePointerId: null,
+  activeAreaId: null,
+  dragMode: null,
+  startPointer: null,
+  startArea: null,
+  panZoomBound: false
+};
+
+function editorClamp(value, min, max) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function editorFindArea(areaId) {
+  return areas.find(area => area.id === areaId);
+}
+
+function editorSetStatus(message) {
+  editorStatusText.textContent = message;
+}
+
+function editorSyncButtons() {
+  editorToggleBtn.classList.toggle('is-active', editorState.enabled);
+  editorToggleBtn.textContent = editorState.enabled ? 'Salir de edición' : 'Editar recuadros';
+  editorSaveBtn.disabled = !editorState.enabled;
+  editorResetBtn.disabled = !editorState.enabled;
+  editorMapWrapper.classList.toggle('is-editing', editorState.enabled);
+}
+
+function editorRenderHotspots() {
+  editorHotspotsContainer.innerHTML = '';
+
+  areas.forEach(area => {
+    const hotspot = document.createElement('div');
+    hotspot.className = 'hotspot';
+    hotspot.style.left = area.x + '%';
+    hotspot.style.top = area.y + '%';
+    hotspot.style.width = area.w + '%';
+    hotspot.style.height = area.h + '%';
+    hotspot.setAttribute('title', area.label);
+
+    if (editorState.enabled) {
+      if (editorState.activeAreaId === area.id) {
+        hotspot.classList.add('is-selected');
+      }
+
+      const label = document.createElement('span');
+      label.className = 'hotspot-label';
+      label.textContent = area.label;
+
+      const handle = document.createElement('span');
+      handle.className = 'hotspot-handle';
+      handle.dataset.handle = 'resize';
+
+      hotspot.appendChild(label);
+      hotspot.appendChild(handle);
+
+      hotspot.addEventListener('pointerdown', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        editorState.activeAreaId = area.id;
+        editorState.activePointerId = event.pointerId;
+        editorState.dragMode = event.target.dataset.handle === 'resize' ? 'resize' : 'move';
+        editorState.startPointer = { x: event.clientX, y: event.clientY };
+        editorState.startArea = { x: area.x, y: area.y, w: area.w, h: area.h };
+
+        editorSetStatus(`Editando "${area.label}": arrastra para ${editorState.dragMode === 'move' ? 'mover' : 'cambiar tamaño'}.`);
+        editorRenderHotspots();
+      });
+    } else {
+      hotspot.addEventListener('click', () => openPanel(area));
+    }
+
+    editorHotspotsContainer.appendChild(hotspot);
+  });
+}
+
+function renderHotspots() {
+  editorRenderHotspots();
+}
+
+function openPanel(area) {
+  if (editorState.enabled) return;
+
+  document.getElementById('pIcon').textContent = area.icon;
+  document.getElementById('pIcon').style.background = area.categoryColor;
+  document.getElementById('pTitle').textContent = area.label;
+  const badge = document.getElementById('pBadge');
+  badge.textContent = area.category;
+  badge.style.background = area.categoryColor;
+  badge.style.color = area.categoryText;
+  document.getElementById('pDesc').textContent = area.desc;
+
+  const rows = document.getElementById('pRows');
+  rows.innerHTML = '';
+  if (area.info) {
+    Object.entries(area.info).forEach(([key, value]) => {
+      const row = document.createElement('div');
+      row.className = 'info-row';
+      row.innerHTML = `<span class="info-label">${key}</span><span class="info-value">${value}</span>`;
+      rows.appendChild(row);
+    });
+  }
+
+  editorOverlay.classList.add('open');
+}
+
+function editorEndDrag() {
+  editorState.activePointerId = null;
+  editorState.dragMode = null;
+  editorState.startPointer = null;
+  editorState.startArea = null;
+}
+
+function editorUpdateAreaFromPointer(event) {
+  const area = editorFindArea(editorState.activeAreaId);
+  const rect = editorHotspotsContainer.getBoundingClientRect();
+  if (!area || !rect.width || !rect.height || !editorState.startPointer || !editorState.startArea) return;
+
+  const deltaX = ((event.clientX - editorState.startPointer.x) / rect.width) * 100;
+  const deltaY = ((event.clientY - editorState.startPointer.y) / rect.height) * 100;
+  const minSize = 1.5;
+
+  if (editorState.dragMode === 'move') {
+    area.x = editorClamp(editorState.startArea.x + deltaX, 0, 100 - area.w);
+    area.y = editorClamp(editorState.startArea.y + deltaY, 0, 100 - area.h);
+  } else if (editorState.dragMode === 'resize') {
+    area.w = editorClamp(editorState.startArea.w + deltaX, minSize, 100 - area.x);
+    area.h = editorClamp(editorState.startArea.h + deltaY, minSize, 100 - area.y);
+  }
+}
+
+function editorToggleMode(forceValue) {
+  editorState.enabled = typeof forceValue === 'boolean' ? forceValue : !editorState.enabled;
+  editorState.activeAreaId = null;
+  editorEndDrag();
+  editorOverlay.classList.remove('open');
+  editorSyncButtons();
+  editorRenderHotspots();
+
+  if (editorState.enabled) {
+    editorSetStatus('Modo edición activo: arrastra un recuadro para moverlo y usa el punto naranja para cambiar su tamaño.');
+  } else {
+    editorSetStatus('Modo normal: toca cualquier área para ver su información.');
+  }
+}
+
+function editorDownloadLayout() {
+  const payload = {
+    exportedAt: new Date().toISOString(),
+    areas: areas.map(({ id, label, x, y, w, h }) => ({
+      id,
+      label,
+      x: Number(x.toFixed(2)),
+      y: Number(y.toFixed(2)),
+      w: Number(w.toFixed(2)),
+      h: Number(h.toFixed(2))
+    }))
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'hotspots-layout.json';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+
+  editorSetStatus('Se descargó hotspots-layout.json con las posiciones actuales de los recuadros.');
+}
+
+function editorRestoreLayout() {
+  areas.forEach((area, index) => {
+    area.x = editorOriginalAreas[index].x;
+    area.y = editorOriginalAreas[index].y;
+    area.w = editorOriginalAreas[index].w;
+    area.h = editorOriginalAreas[index].h;
+  });
+
+  editorRenderHotspots();
+  editorSetStatus('Se restauraron las coordenadas originales del archivo.');
+}
+
+function initPanZoom() {
+  if (editorState.panZoomBound) return;
+  editorState.panZoomBound = true;
+
+  const viewport = document.getElementById('mapViewport');
+  const maxScale = 3;
+  let minScale = 1;
+  let scale = 1;
+  let lastScale = 1;
+  let startDist = 0;
+  let translate = { x: 0, y: 0 };
+  let lastTouch = null;
+
+  function getBaseSize() {
+    return {
+      width: viewport.offsetWidth,
+      height: viewport.offsetHeight
+    };
+  }
+
+  function isPortraitViewport() {
+    return window.matchMedia('(orientation: portrait)').matches;
+  }
+
+  function clampScale(nextScale) {
+    return Math.min(maxScale, Math.max(minScale, nextScale));
+  }
+
+  function clampTranslate(nextTranslate) {
+    const { width: baseWidth, height: baseHeight } = getBaseSize();
+    const scaledWidth = baseWidth * scale;
+    const scaledHeight = baseHeight * scale;
+    const maxX = Math.max(0, (scaledWidth - editorMapWrapper.clientWidth) / 2);
+    const maxY = Math.max(0, (scaledHeight - editorMapWrapper.clientHeight) / 2);
+
+    return {
+      x: Math.min(maxX, Math.max(-maxX, nextTranslate.x)),
+      y: Math.min(maxY, Math.max(-maxY, nextTranslate.y))
+    };
+  }
+
+  function setTransform() {
+    translate = clampTranslate(translate);
+    viewport.style.transform = `translate(${translate.x}px, ${translate.y}px) scale(${scale})`;
+  }
+
+  function resetView() {
+    viewport.style.transform = 'translate(0px, 0px) scale(1)';
+    const { width: baseWidth, height: baseHeight } = getBaseSize();
+    if (!baseWidth || !baseHeight) return;
+
+    const fitWidthScale = editorMapWrapper.clientWidth / baseWidth;
+    const fitHeightScale = editorMapWrapper.clientHeight / baseHeight;
+    minScale = isPortraitViewport() ? Math.max(1, fitHeightScale) : Math.max(1, fitWidthScale);
+    scale = minScale;
+    lastScale = scale;
+    translate = { x: 0, y: 0 };
+    setTransform();
+  }
+
+  viewport.addEventListener('touchstart', (event) => {
+    if (editorState.enabled) return;
+
+    if (event.touches.length === 2) {
+      startDist = Math.hypot(
+        event.touches[0].clientX - event.touches[1].clientX,
+        event.touches[0].clientY - event.touches[1].clientY
+      );
+      lastScale = scale;
+    } else if (event.touches.length === 1) {
+      lastTouch = {
+        x: event.touches[0].clientX - translate.x,
+        y: event.touches[0].clientY - translate.y
+      };
+    }
+  }, { passive: false });
+
+  viewport.addEventListener('touchmove', (event) => {
+    if (editorState.enabled) return;
+
+    if (event.touches.length === 2) {
+      event.preventDefault();
+      const currentDistance = Math.hypot(
+        event.touches[0].clientX - event.touches[1].clientX,
+        event.touches[0].clientY - event.touches[1].clientY
+      );
+      const delta = currentDistance / startDist;
+      scale = clampScale(lastScale * delta);
+      setTransform();
+    } else if (event.touches.length === 1 && lastTouch) {
+      event.preventDefault();
+      translate = {
+        x: event.touches[0].clientX - lastTouch.x,
+        y: event.touches[0].clientY - lastTouch.y
+      };
+      setTransform();
+    }
+  }, { passive: false });
+
+  viewport.addEventListener('touchend', () => {
+    if (editorState.enabled) return;
+    lastTouch = null;
+  });
+
+  editorMapWrapper.addEventListener('wheel', (event) => {
+    if (editorState.enabled) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    event.preventDefault();
+    scale = clampScale(scale + (-event.deltaY * 0.001));
+    setTransform();
+  }, { passive: false });
+
+  window.addEventListener('resize', resetView);
+  resetView();
+}
+
+window.addEventListener('pointermove', (event) => {
+  if (!editorState.enabled || editorState.activePointerId !== event.pointerId || !editorState.activeAreaId) return;
+  event.preventDefault();
+  editorUpdateAreaFromPointer(event);
+  editorRenderHotspots();
+});
+
+window.addEventListener('pointerup', (event) => {
+  if (editorState.activePointerId !== event.pointerId) return;
+  editorEndDrag();
+});
+
+window.addEventListener('pointercancel', (event) => {
+  if (editorState.activePointerId !== event.pointerId) return;
+  editorEndDrag();
+});
+
+editorToggleBtn.addEventListener('click', () => editorToggleMode());
+editorSaveBtn.addEventListener('click', editorDownloadLayout);
+editorResetBtn.addEventListener('click', editorRestoreLayout);
+
+editorMapImg.onload = () => {
+  editorRenderHotspots();
+  initPanZoom();
+};
+
+if (editorMapImg.complete) {
+  editorRenderHotspots();
+  initPanZoom();
+}
+
+editorSyncButtons();
 </script>
