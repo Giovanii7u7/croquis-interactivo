@@ -173,6 +173,79 @@ body { font-family: var(--font-sans, sans-serif); }
   background: #e2e8f0;
 }
 
+.panel-media {
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f8fafc;
+  margin-bottom: 18px;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.04);
+}
+
+.panel-image {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  display: block;
+  background: #e2e8f0;
+}
+
+.panel-media .no-media {
+  display: none;
+  min-height: 240px;
+  padding: 24px 18px;
+  text-align: center;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.panel-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+  gap: 10px;
+  padding: 12px;
+}
+
+.panel-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  background: #f8fafc;
+  padding: 0;
+}
+
+.panel-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.panel-thumb.active {
+  border-color: rgba(59, 130, 246, 0.85);
+}
+
+.panel-thumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.06);
+}
+
+.panel-media.no-images .no-media {
+  display: grid;
+}
+
+.panel-media.no-images .panel-gallery,
+.panel-media.no-images .panel-image {
+  display: none;
+}
+
 .panel-badge {
   display: inline-block;
   font-size: 12px;
@@ -252,6 +325,11 @@ body { font-family: var(--font-sans, sans-serif); }
       <button class="panel-close" id="closeBtn" aria-label="Cerrar">×</button>
     </div>
     <span class="panel-badge" id="pBadge"></span>
+    <div class="panel-media" id="pMedia">
+      <img id="pMainImage" class="panel-image" src="" alt="" />
+      <div class="no-media" id="pNoMedia">No hay imágenes disponibles para esta área.</div>
+      <div class="panel-gallery" id="pGallery"></div>
+    </div>
     <p class="desc-text" id="pDesc"></p>
     <div id="pRows"></div>
   </div>
@@ -551,6 +629,38 @@ const areas = [
   }
 ];
 
+const imageGallery = {
+  auditorio: ['images/auditorio/auditorio_0152.HEIC','images/auditorio/auditorio_0153.HEIC','images/auditorio/auditorio_0154.HEIC','images/auditorio/auditorio_0155.HEIC','images/auditorio/auditorio_0156.HEIC','images/auditorio/auditorio_0157.HEIC'],
+  aulas_bloque1: ['images/aulas_bloque1/aulas_bloque1_0053.HEIC','images/aulas_bloque1/aulas_bloque1_0054.HEIC','images/aulas_bloque1/aulas_bloque1_0055.HEIC','images/aulas_bloque1/aulas_bloque1_0056.HEIC','images/aulas_bloque1/aulas_bloque1_0057.HEIC','images/aulas_bloque1/aulas_bloque1_0058.HEIC','images/aulas_bloque1/aulas_bloque1_0059.HEIC','images/aulas_bloque1/aulas_bloque1_0060.HEIC','images/aulas_bloque1/aulas_bloque1_0061.HEIC','images/aulas_bloque1/aulas_bloque1_0062.HEIC','images/aulas_bloque1/aulas_bloque1_0063.HEIC'],
+  aulas_bloque2: ['images/aulas_bloque2/aulas_bloque2_0092.HEIC','images/aulas_bloque2/aulas_bloque2_0093.HEIC','images/aulas_bloque2/aulas_bloque2_0094.HEIC','images/aulas_bloque2/aulas_bloque2_0095.HEIC','images/aulas_bloque2/aulas_bloque2_0096.HEIC','images/aulas_bloque2/aulas_bloque2_0097.HEIC','images/aulas_bloque2/aulas_bloque2_0098.HEIC','images/aulas_bloque2/aulas_bloque2_0099.HEIC','images/aulas_bloque2/aulas_bloque2_0100.HEIC','images/aulas_bloque2/aulas_bloque2_0101.HEIC','images/aulas_bloque2/aulas_bloque2_0102.HEIC','images/aulas_bloque2/aulas_bloque2_0103.HEIC','images/aulas_bloque2/aulas_bloque2_0105.HEIC'],
+  aulas_bloque3: ['images/aulas_bloque3/aulas_bloque3_0127.HEIC','images/aulas_bloque3/aulas_bloque3_0128.HEIC','images/aulas_bloque3/aulas_bloque3_0129.HEIC','images/aulas_bloque3/aulas_bloque3_0130.HEIC','images/aulas_bloque3/aulas_bloque3_0131.HEIC','images/aulas_bloque3/aulas_bloque3_0132.HEIC','images/aulas_bloque3/aulas_bloque3_0133.HEIC','images/aulas_bloque3/aulas_bloque3_0134.HEIC','images/aulas_bloque3/aulas_bloque3_0135.HEIC','images/aulas_bloque3/aulas_bloque3_0136.HEIC','images/aulas_bloque3/aulas_bloque3_0137.HEIC','images/aulas_bloque3/aulas_bloque3_0138.HEIC','images/aulas_bloque3/aulas_bloque3_0139.HEIC','images/aulas_bloque3/aulas_bloque3_0140.HEIC','images/aulas_bloque3/aulas_bloque3_0141.HEIC','images/aulas_bloque3/aulas_bloque3_0142.HEIC'],
+  autoacceso: ['images/autoacceso/autoacceso_0072.HEIC','images/autoacceso/autoacceso_0073.HEIC','images/autoacceso/autoacceso_0074.HEIC'],
+  banos_norte: ['images/banos_norte/banos_norte_0121.HEIC','images/banos_norte/banos_norte_0122.HEIC','images/banos_norte/banos_norte_0123.HEIC'],
+  banos_sur: ['images/banos_sur/banos_sur_0162.HEIC','images/banos_sur/banos_sur_0163.HEIC','images/banos_sur/banos_sur_0164.HEIC'],
+  biblioteca: ['images/biblioteca/biblioteca_0044.HEIC','images/biblioteca/biblioteca_0047.HEIC'],
+  bodega: ['images/bodega/bodega_0158.HEIC','images/bodega/bodega_0159.HEIC','images/bodega/bodega_0160.HEIC','images/bodega/bodega_0161.HEIC'],
+  cafeteria: ['images/cafeteria/cafeteria_0106.HEIC','images/cafeteria/cafeteria_0107.HEIC','images/cafeteria/cafeteria_0108.HEIC','images/cafeteria/cafeteria_0109.HEIC','images/cafeteria/cafeteria_0110.HEIC'],
+  carpinteria: ['images/carpinteria/carpinteria_0069.HEIC','images/carpinteria/carpinteria_0070.HEIC','images/carpinteria/carpinteria_0071.HEIC'],
+  casa_rector: ['images/casa_rector/casa_rector_0188.HEIC','images/casa_rector/casa_rector_0190.HEIC','images/casa_rector/casa_rector_0191.HEIC'],
+  cubos: ['images/cubos/cubos_0118.HEIC','images/cubos/cubos_0119.HEIC','images/cubos/cubos_0120.HEIC'],
+  electronica: ['images/electronica/electronica_0043.HEIC'],
+  estacionamiento: ['images/estacionamiento/estacionamiento_0111.HEIC','images/estacionamiento/estacionamiento_0112.HEIC','images/estacionamiento/estacionamiento_0113.HEIC','images/estacionamiento/estacionamiento_0114.HEIC','images/estacionamiento/estacionamiento_0115.HEIC','images/estacionamiento/estacionamiento_0116.HEIC','images/estacionamiento/estacionamiento_0117.HEIC'],
+  estatua: ['images/estatua/estatua_0064.HEIC','images/estatua/estatua_0065.HEIC','images/estatua/estatua_0066.HEIC','images/estatua/estatua_0067.HEIC','images/estatua/estatua_0068.HEIC'],
+  habitaciones: ['images/habitaciones/habitaciones_0175.HEIC','images/habitaciones/habitaciones_0182.HEIC','images/habitaciones/habitaciones_0183.HEIC','images/habitaciones/habitaciones_0184.HEIC','images/habitaciones/habitaciones_0185.HEIC','images/habitaciones/habitaciones_0186.HEIC','images/habitaciones/habitaciones_0187.HEIC'],
+  idiomas: ['images/idiomas/idiomas_0084.HEIC','images/idiomas/idiomas_0085.HEIC','images/idiomas/idiomas_0086.HEIC','images/idiomas/idiomas_0087.HEIC','images/idiomas/idiomas_0088.HEIC','images/idiomas/idiomas_0090.HEIC'],
+  instituto: ['images/instituto/instituto_0048.HEIC','images/instituto/instituto_0050.HEIC','images/instituto/instituto_0052.HEIC'],
+  rectoria: ['images/rectoria/rectoria_0149.HEIC','images/rectoria/rectoria_0150.HEIC'],
+  sala1: ['images/sala1/sala1_0080.HEIC','images/sala1/sala1_0081.HEIC','images/sala1/sala1_0083.HEIC'],
+  sala2: ['images/sala2/sala2_0076.HEIC','images/sala2/sala2_0078.HEIC','images/sala2/sala2_0079.HEIC'],
+  sala3: ['images/sala3/sala3_0039.HEIC','images/sala3/sala3_0040.HEIC','images/sala3/sala3_0041.HEIC','images/sala3/sala3_0042.HEIC'],
+  sala_redes: ['images/sala_redes/sala_redes_0037.HEIC'],
+  sala_software: ['images/sala_software/sala_software_0035.HEIC','images/sala_software/sala_software_0036.HEIC'],
+  sala_tesis: ['images/sala_tesis/sala_tesis_0169.HEIC','images/sala_tesis/sala_tesis_0170.HEIC'],
+  sala_trabajo1: ['images/sala_trabajo1/sala_trabajo1_0165.HEIC','images/sala_trabajo1/sala_trabajo1_0167.HEIC','images/sala_trabajo1/sala_trabajo1_0173.HEIC'],
+  servicios: ['images/servicios/servicios_0151.HEIC'],
+  vicerrectoria: ['images/vicerrectoria/vicerrectoria_0143.HEIC','images/vicerrectoria/vicerrectoria_0144.HEIC','images/vicerrectoria/vicerrectoria_0146.HEIC','images/vicerrectoria/vicerrectoria_0147.HEIC']
+};
+
 const mapWrapper = document.getElementById('mapWrapper');
 const mapImg = document.getElementById('mapImg');
 const hotspotsContainer = document.getElementById('hotspotsContainer');
@@ -746,6 +856,50 @@ function openPanel(area) {
   badge.style.background = area.categoryColor;
   badge.style.color = area.categoryText;
   document.getElementById('pDesc').textContent = area.desc;
+
+  const mainImage = document.getElementById('pMainImage');
+  const gallery = document.getElementById('pGallery');
+  const noMedia = document.getElementById('pNoMedia');
+  const imageList = imageGallery[area.id] || [];
+
+  gallery.innerHTML = '';
+  if (imageList.length > 0) {
+    mainImage.src = imageList[0];
+    mainImage.alt = `${area.label} - imagen`;
+    mainImage.onerror = () => {
+      mainImage.style.display = 'none';
+      noMedia.style.display = 'grid';
+    };
+    noMedia.style.display = 'none';
+    mainImage.style.display = 'block';
+
+    imageList.forEach((src, index) => {
+      const thumb = document.createElement('button');
+      thumb.type = 'button';
+      thumb.className = 'panel-thumb' + (index === 0 ? ' active' : '');
+      const thumbImg = document.createElement('img');
+      thumbImg.src = src;
+      thumbImg.alt = `${area.label} miniatura ${index + 1}`;
+      thumbImg.onerror = () => {
+        thumbImg.style.display = 'none';
+      };
+      thumb.appendChild(thumbImg);
+      thumb.addEventListener('click', () => {
+        mainImage.src = src;
+        mainImage.alt = `${area.label} - imagen`;
+        mainImage.style.display = 'block';
+        noMedia.style.display = 'none';
+        gallery.querySelectorAll('.panel-thumb').forEach(btn => btn.classList.remove('active'));
+        thumb.classList.add('active');
+      });
+      gallery.appendChild(thumb);
+    });
+  } else {
+    mainImage.src = '';
+    mainImage.alt = `Sin imagen disponible`;
+    mainImage.style.display = 'none';
+    noMedia.style.display = 'grid';
+  }
 
   const rows = document.getElementById('pRows');
   rows.innerHTML = '';
