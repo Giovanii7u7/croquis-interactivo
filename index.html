@@ -1,8 +1,13 @@
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+:root {
+  --font-sans: 'Inter', sans-serif;
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { min-height: 100%; }
+html, body { min-height: 100%; font-size: 16px; line-height: 1.5; }
 body { font-family: var(--font-sans, sans-serif); }
+button, .panel-close { font-family: inherit; font-weight: 600; }
 
 .app {
   min-height: 100dvh;
@@ -19,7 +24,7 @@ body { font-family: var(--font-sans, sans-serif); }
   align-items: center;
   gap: 10px;
 }
-.header h1 { font-size: 16px; font-weight: 500; }
+.header h1 { font-size: 16px; font-weight: 600; }
 .header .subtitle { font-size: 12px; opacity: 0.7; }
 
 .map-section {
