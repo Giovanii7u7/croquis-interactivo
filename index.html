@@ -556,6 +556,13 @@ const mapImg = document.getElementById('mapImg');
 const hotspotsContainer = document.getElementById('hotspotsContainer');
 const overlay = document.getElementById('overlay');
 const closeBtn = document.getElementById('closeBtn');
+const touchInteractionState = {
+  startX: 0,
+  startY: 0,
+  moved: false,
+  multitouch: false,
+  suppressClickUntil: 0
+};
 
 const imgSrc = 'images/croquis.jpeg';
 mapImg.src = imgSrc;
@@ -580,6 +587,7 @@ mapImg.onload = () => {
 function initPanZoom() {
   const viewport = document.getElementById('mapViewport');
   const maxScale = 3;
+  const tapMoveThreshold = 8;
   let minScale = 1;
   let scale = 1;
   let lastScale = 1;
@@ -638,12 +646,19 @@ function initPanZoom() {
   // Touch handlers
   viewport.addEventListener('touchstart', (e) => {
     if (e.touches.length === 2) {
+      touchInteractionState.multitouch = true;
+      touchInteractionState.moved = true;
+      touchInteractionState.suppressClickUntil = Date.now() + 400;
       startDist = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
       );
       lastScale = scale;
     } else if (e.touches.length === 1) {
+      touchInteractionState.startX = e.touches[0].clientX;
+      touchInteractionState.startY = e.touches[0].clientY;
+      touchInteractionState.moved = false;
+      touchInteractionState.multitouch = false;
       lastTouch = { x: e.touches[0].clientX - translate.x, y: e.touches[0].clientY - translate.y };
     }
   }, { passive: false });
@@ -651,6 +666,9 @@ function initPanZoom() {
   viewport.addEventListener('touchmove', (e) => {
     if (e.touches.length === 2) {
       e.preventDefault();
+      touchInteractionState.multitouch = true;
+      touchInteractionState.moved = true;
+      touchInteractionState.suppressClickUntil = Date.now() + 400;
       const curDist = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
@@ -660,6 +678,12 @@ function initPanZoom() {
       setTransform();
     } else if (e.touches.length === 1 && lastTouch) {
       e.preventDefault();
+      const movedX = Math.abs(e.touches[0].clientX - touchInteractionState.startX);
+      const movedY = Math.abs(e.touches[0].clientY - touchInteractionState.startY);
+      if (movedX > tapMoveThreshold || movedY > tapMoveThreshold) {
+        touchInteractionState.moved = true;
+        touchInteractionState.suppressClickUntil = Date.now() + 400;
+      }
       translate = {
         x: e.touches[0].clientX - lastTouch.x,
         y: e.touches[0].clientY - lastTouch.y
@@ -669,7 +693,14 @@ function initPanZoom() {
   }, { passive: false });
 
   viewport.addEventListener('touchend', (e) => {
-    if (e.touches.length === 0) lastTouch = null;
+    if (e.touches.length === 0) {
+      if (touchInteractionState.moved || touchInteractionState.multitouch) {
+        touchInteractionState.suppressClickUntil = Date.now() + 400;
+      }
+      touchInteractionState.moved = false;
+      touchInteractionState.multitouch = false;
+      lastTouch = null;
+    }
   });
 
   // Mouse wheel zoom
@@ -695,7 +726,13 @@ function renderHotspots(natW, natH) {
     div.style.width = area.w + '%';
     div.style.height = area.h + '%';
     div.setAttribute('title', area.label);
-    div.addEventListener('click', () => openPanel(area));
+    div.addEventListener('click', (event) => {
+      if (Date.now() < touchInteractionState.suppressClickUntil) {
+        event.preventDefault();
+        return;
+      }
+      openPanel(area);
+    });
     hotspotsContainer.appendChild(div);
   });
 }
